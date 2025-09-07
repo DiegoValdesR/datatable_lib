@@ -1,0 +1,24 @@
+.datatable{
+    border-collapse:collapse;
+    width: 100%;
+    text-align: center;
+    overflow-x: auto;
+}
+
+.datatable thead{
+    background-color: #474747;
+}
+
+.datatable th, .datatable td{
+    max-width: 120px;
+    padding: 15px;
+}
+
+.datatable tbody{
+    text-align: center;
+    border-bottom: #b4b4b4e1;
+}
+
+.datatable.stripped tbody tr:nth-child(even){
+    background-color: #474747 !important;
+}

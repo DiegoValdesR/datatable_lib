@@ -1,0 +1,30 @@
+{
+  "type": "module",
+  "name": "datatable_js",
+  "version": "1.0.0",
+  "description": "A small library that creates a table with small configurations",
+  "main": "index.js",
+  "scripts": {
+    "tsc:build" : "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DiegoValdesR/datatable_lib.git"
+  },
+  "keywords": [
+    "data",
+    "datatable",
+    "tsc",
+    "js"
+  ],
+  "author": "Diego Valdés",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DiegoValdesR/datatable_lib/issues"
+  },
+  "homepage": "https://github.com/DiegoValdesR/datatable_lib#readme",
+  "devDependencies": {
+    "typescript": "^5.9.2"
+  }
+}
