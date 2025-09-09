@@ -5,48 +5,102 @@ interface IColumn{
     body? : string
 }
 
+type Data = Record<string,any>[]
+
 interface ITable {
-    data : object[],
-    columns : IColumn[], 
-    pagination? : boolean
+    data : Data,
+    columns : IColumn[],
+    tableId : string
 }
 
 export class Table{
-    // #RECORDS_PER_PAGE : number = 10;
+    private recordsPerPage : number = 10;
     // static records : object[] = [];
     // static filteredRecords : object[] = [];
     // static numPages : number = 0;
     // static recordsCount : number = 0;
-    // static currentPage : number = 1;
+    private currentPage : number = 1;
+
     private config : ITable;
 
-    constructor({data, columns, pagination} : ITable){
+    constructor({data, columns, tableId} : ITable){
         this.config = {
             data : data,
             columns : columns,
-            pagination : pagination
+            tableId: tableId
         }
     }
 
     /**
      * Crea una tabla dentro de un elemento HTML 
      */
-    public getTable() : HTMLTableElement | void{        
+    public getTable() : HTMLDivElement | void{        
         try {
+            //Creamos el contenedor principal de la tabla
+            const container = document.createElement("div")
+            container.classList.add("table-cont")
+
             const table = document.createElement("table")
             table.classList.add("datatable")
+            table.id = this.config.tableId
             
+            const searchBar = this.drawSearchBar()
             const tableHead = this.drawHeaders()
             const tableBody = this.drawBody()
             
             table.appendChild(tableHead)
             table.appendChild(tableBody)
 
-            return table
+            container.appendChild(searchBar)
+            container.appendChild(table)
+
+            return container
+
         } catch (error : any) {
             console.error(error.message)
         }
     };
+
+    private drawSearchBar(){
+        //We create the container for the rest of the elements
+        const container = document.createElement("div")
+        container.classList.add("searchbar-cont")
+
+        const spanEntries = document.createElement("span")
+        spanEntries.innerText = "registros por página"
+        const selectEntries = document.createElement("select")
+        selectEntries.title = "Seleccione una opción"
+        const arrEntries = [5,10,20,50,100]
+        
+        arrEntries.forEach(num => {
+            const option = document.createElement("option")
+            option.value = num.toString(), option.innerText = num.toString()
+
+            if(num === this.recordsPerPage){
+                option.selected = true
+            }
+
+            selectEntries.appendChild(option)
+        })
+
+        const inputSearch  = document.createElement("input")
+        inputSearch.setAttribute("type","search")
+
+        //Creating the corresponding events
+        selectEntries.addEventListener("change",({target}) => {
+            const option = target as HTMLOptionElement
+            this.recordsPerPage = parseInt(option.value)
+            //Render the table content again
+            this.updateTable()
+        })
+
+        inputSearch.addEventListener("input",() => console.log("Typing"))
+        
+        container.appendChild(spanEntries)
+        container.appendChild(selectEntries)
+        container.appendChild(inputSearch)
+        return container
+    }
     
     /**
      * Creamos la cabecera de la tabla
@@ -74,13 +128,16 @@ export class Table{
     private drawBody(){
         const tableBody = document.createElement("tbody")
         const columns = this.config.columns
-        const data = this.config.data
+        const data : Record<string,any>[] = this.config.data
 
         if(data.length < 1){
             throw new Error("No data was sent")
         }
 
-        data.forEach((obj : Record <string,any>) => {
+        const offset = (this.currentPage - 1) * this.recordsPerPage
+        const limit = Math.min(data.length, offset + this.recordsPerPage)
+
+        for (let i = offset; i < limit; i++) {
             const tableBodyRow = document.createElement("tr")
 
             columns.forEach((column) => {
@@ -102,11 +159,16 @@ export class Table{
 
                     case "field":
                         if(column.field) {
-                            const fieldData =  obj[column.field]
+                            const fieldData = data[i] 
                             if(!fieldData){
+                                throw new Error(`The column doesn't have data`)
+                            }
+
+                            if(!fieldData[column.field]){
                                 throw new Error(`The key ${column.field} does not exist in the data object`)
                             }
-                            tableData.innerText = fieldData
+
+                            tableData.innerText = fieldData[column.field]
                         }
                         
                         break
@@ -118,9 +180,26 @@ export class Table{
                 if(tableData.innerHTML != "" || tableData.innerText !== ""){
                     tableBodyRow.appendChild(tableData)
                     tableBody.appendChild(tableBodyRow)
-                }
+                };
             });
-        });
+        }
+
         return tableBody
+    }
+
+    private updateTable(data? : Data){
+        if(data){
+            this.config.data = data
+        }
+
+        const table = document.querySelector(`#${this.config.tableId}`)
+        if(!table) throw new Error(`The table with the the id: ${this.config.tableId} was not found`)
+        
+        let oldBody = table.querySelector("tbody")
+        if(!oldBody) throw new Error(`The body of the table was not found`)
+
+        const newBody = this.drawBody()
+        oldBody.innerHTML = "" 
+        oldBody.innerHTML = newBody.innerHTML
     }
 }
