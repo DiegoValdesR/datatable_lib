@@ -1,11 +1,11 @@
+import { Filter } from "./functions/Filter.js"
+import { Pagination } from "./functions/Pagination.js"
 
 interface IColumn{
     header: string
     field?: string
-    body? : string
+    body? : (rowData : Record<string,any>) => string | HTMLElement
 }
-
-type Data = Record<string,any>[]
 
 interface ITable {
     data : Data,
@@ -15,13 +15,11 @@ interface ITable {
 
 export class Table{
     private recordsPerPage : number = 10;
-    // static records : object[] = [];
-    // static filteredRecords : object[] = [];
-    // static numPages : number = 0;
-    // static recordsCount : number = 0;
+    private numPages : number = 0;
+    private recordsCount : number = 0;
     private currentPage : number = 1;
-
-    private config : ITable;
+    private currentPageRecords : number = 0
+    private config : ITable
 
     constructor({data, columns, tableId} : ITable){
         this.config = {
@@ -34,11 +32,11 @@ export class Table{
     /**
      * Crea una tabla dentro de un elemento HTML 
      */
-    public getTable() : HTMLDivElement | void{        
+    public getTable(){        
         try {
             //Creamos el contenedor principal de la tabla
             const container = document.createElement("div")
-            container.classList.add("table-cont")
+            container.classList.add("datatable-cont")
 
             const table = document.createElement("table")
             table.classList.add("datatable")
@@ -47,12 +45,14 @@ export class Table{
             const searchBar = this.drawSearchBar()
             const tableHead = this.drawHeaders()
             const tableBody = this.drawBody()
+            const tableFooter = this.drawFooter()
             
             table.appendChild(tableHead)
             table.appendChild(tableBody)
 
             container.appendChild(searchBar)
             container.appendChild(table)
+            container.appendChild(tableFooter)
 
             return container
 
@@ -66,10 +66,16 @@ export class Table{
         const container = document.createElement("div")
         container.classList.add("searchbar-cont")
 
+        //Container for the selector of the number of pages displayed per page
+        const selectContainer = document.createElement("div")
+        selectContainer.classList.add("select-container")
+        //Elements for the select entries per page section
         const spanEntries = document.createElement("span")
         spanEntries.innerText = "registros por página"
         const selectEntries = document.createElement("select")
         selectEntries.title = "Seleccione una opción"
+
+        selectContainer.appendChild(selectEntries), selectContainer.appendChild(spanEntries)
         const arrEntries = [5,10,20,50,100]
         
         arrEntries.forEach(num => {
@@ -82,7 +88,7 @@ export class Table{
 
             selectEntries.appendChild(option)
         })
-
+    
         const inputSearch  = document.createElement("input")
         inputSearch.setAttribute("type","search")
 
@@ -90,17 +96,22 @@ export class Table{
         selectEntries.addEventListener("change",({target}) => {
             const option = target as HTMLOptionElement
             this.recordsPerPage = parseInt(option.value)
+            this.currentPage = Math.min(this.currentPage, this.config.data.length / this.recordsPerPage)
             //Render the table content again
-            this.updateTable()
+            this.updateTableBody()
         })
 
-        inputSearch.addEventListener("input",() => console.log("Typing"))
+        const filter = new Filter(this.config.data)
+        inputSearch.addEventListener("input",() => {
+            this.currentPage = 1
+            const newData = filter.filterData(inputSearch.value)
+            this.updateTableBody(newData)
+        })
         
-        container.appendChild(spanEntries)
-        container.appendChild(selectEntries)
+        container.appendChild(selectContainer)
         container.appendChild(inputSearch)
         return container
-    }
+    };
     
     /**
      * Creamos la cabecera de la tabla
@@ -128,17 +139,21 @@ export class Table{
     private drawBody(){
         const tableBody = document.createElement("tbody")
         const columns = this.config.columns
-        const data : Record<string,any>[] = this.config.data
-
-        if(data.length < 1){
-            throw new Error("No data was sent")
-        }
+        const data : Data = this.config.data
+        
+        if(data.length < 1) throw new Error("No data was sent")
 
         const offset = (this.currentPage - 1) * this.recordsPerPage
         const limit = Math.min(data.length, offset + this.recordsPerPage)
+        this.recordsCount = data.length
+        this.currentPageRecords = limit - offset
+        this.numPages = Math.ceil(this.recordsCount / this.recordsPerPage)
 
         for (let i = offset; i < limit; i++) {
+            const rowData = data[i]
             const tableBodyRow = document.createElement("tr")
+
+            if(!rowData) throw new Error(`The row ${i + 1} does not have data attached to it`)
 
             columns.forEach((column) => {
                 if(!column.body && !column.field){
@@ -150,44 +165,68 @@ export class Table{
                 }
 
                 const tableData = document.createElement("td")
-                const dataAssoc = column.body ? "body" : "field"
+                const dataAssoc = column.field ? "field" : "body"
 
                 switch (dataAssoc) {
                     case "body":
-                        if(column.body) tableData.innerHTML = column.body;
+                        if(column.body){
+                            const content = column.body(rowData)
+
+                            if(typeof content === "string"){
+                                tableData.innerHTML = content
+                                break
+                            }
+
+                            tableData.appendChild(content)
+                        };
                         break;
 
                     case "field":
                         if(column.field) {
-                            const fieldData = data[i] 
-                            if(!fieldData){
-                                throw new Error(`The column doesn't have data`)
-                            }
-
-                            if(!fieldData[column.field]){
+                            if(!rowData[column.field]){
                                 throw new Error(`The key ${column.field} does not exist in the data object`)
                             }
-
-                            tableData.innerText = fieldData[column.field]
+                            tableData.innerText = rowData[column.field]
                         }
-                        
-                        break
+                        break;
                 
                     default:
-                        throw new Error("What the fuck");
+                        throw new Error("Unexpected case");
                 }
 
-                if(tableData.innerHTML != "" || tableData.innerText !== ""){
-                    tableBodyRow.appendChild(tableData)
-                    tableBody.appendChild(tableBodyRow)
-                };
+                tableBodyRow.appendChild(tableData)
             });
+
+            tableBody.appendChild(tableBodyRow)
         }
 
         return tableBody
     }
 
-    private updateTable(data? : Data){
+    private drawFooter(){
+        const footerContainer = document.createElement('div')
+        footerContainer.classList.add("datatable-footer")
+        const spanRecords = document.createElement("span")
+        spanRecords.innerText = `Mostrando ${this.currentPageRecords} de ${this.recordsPerPage} para un total de ${this.recordsCount}`
+        
+        //Drawing the pagination
+        const pagination = new Pagination({
+            numPages: this.numPages, 
+            currentPage: this.currentPage,
+            tableId: this.config.tableId
+        })
+
+        const paginationContainer = pagination.drawPagination()
+        //Pagination events
+
+        //Appending all the elements 
+        footerContainer.appendChild(spanRecords)
+        footerContainer.appendChild(paginationContainer)
+
+        return footerContainer
+    }
+
+    private updateTableBody(data? : Data){
         if(data){
             this.config.data = data
         }

@@ -3,30 +3,29 @@ import { Table } from "./dist/Table.js";
 const data = [
     {id: 1, name: "Pacho", age: 18},
     {id: 2, name: "Manolo", age: 32},
-    {id: 3, name: "Michael", age: 44},
-    {id: 4, name: "Leonardo", age: 99},
-    {id: 5, name: "Lopez", age: 12},
-    {id: 6, name: "Lopez", age: 12},
-    {id: 7, name: "Lopez", age: 12},
-    {id: 8, name: "Lopez", age: 12},
-    {id: 9, name: "Lopez", age: 12},
-    {id: 10, name: "Lopez", age: 12},
-    {id: 11, name: "Lopez", age: 12},
-    {id: 12, name: "Lopez", age: 12},
-    {id: 13, name: "Lopez", age: 12},
-    {id: 14, name: "Lopez", age: 12},
+    {id: 3, name: "Michael", age: 44}
 ]
 
-const body = `
-    <div class="actions">
-        <button type="button">
-            Ver detalles
-        </button>
-        <button type="button">
-            Actualizar
-        </button>
-    </div>
-`
+for(let i = 4; i <= 1000; i++){
+    data.push({
+        id: i,
+        name: Math.floor(Math.random() * 1000),
+        age: i
+    })
+}
+
+const body = (rowData) => {
+    return  `
+        <div class="actions">
+            <button type="button" data-id="${rowData.id}" id="view">
+                Ver detalles
+            </button>
+            <button type="button" data-id="${rowData.id}" id="update">
+                Actualizar
+            </button>
+        </div>
+    `
+}
 
 const columns = [
     {header: "ID", field: "id"},
@@ -43,3 +42,9 @@ const tableObj = new Table({
 
 const table = tableObj.getTable()
 document.body.appendChild(table)
+
+document.addEventListener("DOMContentLoaded",() => {
+    document.querySelector("#view").addEventListener('click',(e) => console.log(e))
+})
+
+console.log(document.querySelector(".datatable tbody"))
