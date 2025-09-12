@@ -3,16 +3,16 @@ import { Table } from "./dist/Table.js";
 const data = [
     {id: 1, name: "Pacho", age: 18},
     {id: 2, name: "Manolo", age: 32},
-    {id: 3, name: "Michael", age: 44}
+    {id: 3, name: "Michael", age: 44},
+    {id: 3, name: "Michael", age: 44},
+    {id: 3, name: "Michael", age: 44},
+    {id: 3, name: "Michael", age: 44},
+    {id: 3, name: "Michael", age: 44},
+    {id: 3, name: "Michael", age: 44},
+    {id: 3, name: "Michael", age: 44},
+    {id: 3, name: "Michael", age: 44},
 ]
 
-for(let i = 4; i <= 1000; i++){
-    data.push({
-        id: i,
-        name: Math.floor(Math.random() * 1000),
-        age: i
-    })
-}
 
 const body = (rowData) => {
     return  `
@@ -46,5 +46,3 @@ document.body.appendChild(table)
 document.addEventListener("DOMContentLoaded",() => {
     document.querySelector("#view").addEventListener('click',(e) => console.log(e))
 })
-
-console.log(document.querySelector(".datatable tbody"))

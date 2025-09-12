@@ -1,26 +1,55 @@
-interface Config{
-    tableId : string
-    numPages : number
+interface Footer{
+    currentPageRecords : number
+    recordsPerPage : number
+    recordsCount : number
+}
+
+interface Pages{
     currentPage : number
+    numPages: number
 }
 
 export class Pagination{
-    private config : Config
+    public drawFooter(params : Footer){
+        const footerContainer = document.createElement('div')
+        footerContainer.classList.add("datatable-footer")
+        const spanRecords = document.createElement("span")
 
-    constructor({numPages, currentPage, tableId} : Config){
-        this.config = {
-            numPages: numPages,
-            currentPage: currentPage,
-            tableId: tableId
-        }
+        spanRecords.innerText = `Mostrando ${params.currentPageRecords} de ${params.recordsPerPage} para un total de ${params.recordsCount} registros.`
+
+        footerContainer.appendChild(spanRecords)
+
+        return footerContainer
     }
 
-    public drawPagination(){
+    public drawPagination(params : Pages){
         const paginationContainer = document.createElement('div')
         paginationContainer.classList.add('pagination-cont')
 
         const pagesContainer = document.createElement("div")
-        pagesContainer.classList.add('pages-cont') 
+        pagesContainer.classList.add('pages-cont')
+
+        //Setting up the pagination window style
+        const maxButtons = 3
+        const half = Math.floor(maxButtons / 2)
+        let start = Math.max(1,params.currentPage - half)
+        const end = Math.min(params.numPages, start + maxButtons - 1)
+        //Re-assigning the start value with the end value
+        start = Math.max(1, end - maxButtons + 1)
+
+        //Drawing the buttons
+        for(let i = start; i <= end; i++){
+            const button = document.createElement('button')
+            button.dataset.action = "changePage"
+            button.dataset.numPage = i.toString()
+            button.innerText = i.toString()
+
+            if(parseInt(button.dataset.numPage) === i){
+                button.classList.add('active')
+            }
+
+            pagesContainer.appendChild(button)
+        }
 
         const firstPageButton = document.createElement("button")
         firstPageButton.dataset.action = "first"
@@ -40,12 +69,5 @@ export class Pagination{
         arrButtons.forEach(element => paginationContainer.appendChild(element))
 
         return paginationContainer
-    }
-
-    public updatePagination(){
-        const footer = document.querySelector(`#${this.config.tableId} .datatable-footer`)
-        if(!footer) return;
-
-        footer.innerHTML = ""
     }
 }
