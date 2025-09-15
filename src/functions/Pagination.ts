@@ -42,9 +42,10 @@ export class Pagination{
             const button = document.createElement('button')
             button.dataset.action = "changePage"
             button.dataset.numPage = i.toString()
+            button.type = "button"
             button.innerText = i.toString()
 
-            if(parseInt(button.dataset.numPage) === i){
+            if(i === params.currentPage){
                 button.classList.add('active')
             }
 
@@ -52,21 +53,32 @@ export class Pagination{
         }
 
         const firstPageButton = document.createElement("button")
+        firstPageButton.title = "First Page"
+        firstPageButton.innerText = "First Page"
         firstPageButton.dataset.action = "first"
 
         const previousPageButton = document.createElement("button")
+        previousPageButton.title = "Previous Page"
+        previousPageButton.innerText = "Previous Page"
         previousPageButton.dataset.action = "previous"
-        previousPageButton.innerHTML = "<i class='fa-solid fa-arrow-left'></>"
 
         const nextPageButton = document.createElement("button")
+        nextPageButton.title = "Next Page"
+        nextPageButton.innerText = "Next Page"
         nextPageButton.dataset.action = "next"
 
         const lastPageButton = document.createElement("button")
+        lastPageButton.title = "Last Page"
+        lastPageButton.innerText = "Last Page"
         lastPageButton.dataset.action = "last"
 
         const arrButtons = [firstPageButton,previousPageButton,pagesContainer,nextPageButton,lastPageButton]
 
-        arrButtons.forEach(element => paginationContainer.appendChild(element))
+        arrButtons.forEach(element => {
+            element.setAttribute("type","button")
+            element.style.cursor = "pointer"
+            paginationContainer.appendChild(element)
+        })
 
         return paginationContainer
     }

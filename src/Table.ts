@@ -30,11 +30,10 @@ export class Table{
     }
 
     /**
-     * Crea una tabla dentro de un elemento HTML 
+     * Creates the whole table 
      */
     public getTable(){        
         try {
-            //Creamos el contenedor principal de la tabla
             const container = document.createElement("div")
             container.classList.add("datatable-cont")
 
@@ -60,7 +59,9 @@ export class Table{
             console.error(error.message)
         }
     };
-
+    /**
+     * Creating the top of the table that includes a select with values to change the number of records per page and an input for searching by characters
+     */
     private drawSearchBar(){
         //We create the container for the rest of the elements
         const container = document.createElement("div")
@@ -114,9 +115,9 @@ export class Table{
         container.appendChild(inputSearch)
         return container
     };
+
     /**
-     * Creamos la cabecera de la tabla
-     * @param headers Array de strings el cual cada valor representa una columna
+     * We create the header for the table
      */
     private drawHeaders() {
         const tableHead = document.createElement("thead")
@@ -144,13 +145,11 @@ export class Table{
         
         if(data.length < 1) throw new Error("No data was sent")
 
-        const offset = Math.min(0,(this.currentPage - 1) * this.recordsPerPage)
+        const offset = (this.currentPage - 1) * this.recordsPerPage
         const limit = Math.min(data.length, offset + this.recordsPerPage)
         this.recordsCount = data.length
         this.currentPageRecords = limit - offset
         this.numPages = Math.ceil(this.recordsCount / this.recordsPerPage)
-
-        console.log("Limit: " + limit + "\n" + "Offset: " + offset)
 
         for (let i = offset; i < limit; i++) {
             const rowData = data[i]
@@ -211,44 +210,70 @@ export class Table{
         const paginationObj = new Pagination()
         //We check if the element already exists
         const parent = document.querySelector(`#${this.config.tableId}`)?.closest(".datatable-cont")
-        const footer = parent?.querySelector(".datatable-footer")
+        let footerContainer = parent?.querySelector(".datatable-footer")
 
-        if(parent && footer){
-            footer.innerHTML = ""
-
-            footer.innerHTML = paginationObj.drawFooter({currentPageRecords: this.currentPageRecords,
+        if(parent && footerContainer){
+            footerContainer.innerHTML = ""
+            footerContainer.innerHTML = paginationObj.drawFooter({
+                currentPageRecords: this.currentPageRecords,
                 recordsPerPage: this.recordsPerPage,
                 recordsCount: this.recordsCount
             }).innerHTML
-                
-            footer.appendChild(paginationObj.drawPagination({
-                currentPage: this.currentPage,
-                numPages: this.numPages
-            }))
-            
-            return
+
+        }else{
+            footerContainer = paginationObj.drawFooter({
+                currentPageRecords: this.currentPageRecords,
+                recordsPerPage: this.recordsPerPage,
+                recordsCount: this.recordsCount
+            })
         }
-        
-        const footerContainer = paginationObj.drawFooter({
-            currentPageRecords: this.currentPageRecords,
-            recordsPerPage: this.recordsPerPage,
-            recordsCount: this.recordsCount
-        })
-        const paginationContainer = paginationObj.drawPagination({
-            currentPage: this.currentPage,
-            numPages: this.numPages
-        })
+
+        const paginationContainer = paginationObj.drawPagination({numPages: this.numPages, currentPage: this.currentPage})
 
         //Pagination events
         paginationContainer.addEventListener('click',({target}) => {
             const button = target as HTMLButtonElement
+            if(!button) return;
             const dataAction = button.dataset.action
-            if(!button || !dataAction) return
+            if(!dataAction) return
+            
+            switch (dataAction) {
+                case "first":
+                    if(this.currentPage === 1) return;
+                    this.currentPage = 1
+                    break;
+
+                case "previous":
+                    if(this.currentPage <= 1) return;
+                    this.currentPage -= 1
+                    break;
+
+                case "next":
+                    if(this.currentPage >= this.numPages) return;
+                    this.currentPage += 1
+                    break;
+
+                case "last":
+                    if(this.currentPage < 1 || this.currentPage >= this.numPages) return;
+                    this.currentPage = this.numPages
+                    break;
+
+                case "changePage":
+                    const pageNumber = button.dataset.numPage
+                    if(!pageNumber) throw new Error("The number of the page was not found");
+                    this.currentPage = parseInt(pageNumber)
+                    break;
+            
+                default:
+                    break;
+            }
+
+            this.updateTableBody()
+            this.drawFooter()
         })
 
         //Appending all the elements 
         footerContainer.appendChild(paginationContainer)
-
         return footerContainer
     }
 

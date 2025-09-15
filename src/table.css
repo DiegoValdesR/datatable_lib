@@ -107,6 +107,19 @@
     border: 1px solid var(--border-color);
 }
 
+.datatable-footer .pages-cont{
+    display: flex;
+    flex-direction: row;
+}
+
+.pages-cont button{
+    cursor: pointer;
+}
+
+.datatable-cont button.active{
+    background-color: #a09f9f8f;
+}
+
 /*STYLES*/
 .datatable.stripped tbody tr:nth-child(even){
     background-color: var(--border-color) !important;
