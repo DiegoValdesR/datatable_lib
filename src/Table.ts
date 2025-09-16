@@ -1,6 +1,6 @@
 import { Filter } from "./functions/Filter.js"
 import { Pagination } from "./functions/Pagination.js"
-
+import { icons } from "./icons.js"
 interface IColumn{
     header: string
     field?: string
@@ -129,7 +129,10 @@ export class Table{
 
         this.config.columns.forEach((column) => {
             const th = document.createElement("th")
-            th.innerText = column.header
+            th.innerHTML = `
+            ${icons.arrowUp}
+            <span>${column.header}</span>
+            `
             tableHeadRow.appendChild(th) 
         })
 
