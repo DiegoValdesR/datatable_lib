@@ -1,6 +1,7 @@
 import { Filter } from "./functions/Filter.js"
 import { Pagination } from "./functions/Pagination.js"
-import { icons } from "./icons.js"
+import { Sort } from "./functions/Sort.js"
+
 interface IColumn{
     header: string
     field?: string
@@ -122,17 +123,36 @@ export class Table{
     private drawHeaders() {
         const tableHead = document.createElement("thead")
         const tableHeadRow = document.createElement("tr")
-
+        const sortObj = new Sort()
+    
         if(!this.config.columns || this.config.columns.length < 1){
             throw new Error("The headers were not send")
         };
 
-        this.config.columns.forEach((column) => {
+        this.config.columns.forEach((column, index) => {
             const th = document.createElement("th")
-            th.innerHTML = `
-            ${icons.arrowUp}
-            <span>${column.header}</span>
-            `
+            th.innerText = column.header
+            const target = column.field
+            //Order in ascending / descending order button
+            if(target){
+                const buttonOrder = document.createElement("button")
+                buttonOrder.type = "button"
+                buttonOrder.innerText = "Ordenar"
+                th.appendChild(buttonOrder)
+
+                const selectFilter = document.createElement("select")
+                selectFilter.title = "Seleccione una opción"
+                th.appendChild(selectFilter)
+
+                //Events
+                buttonOrder.addEventListener('click',() => {
+                    if(target){
+                        const newOrder = sortObj.sortData(this.config.data, target)
+                        this.updateTableBody(newOrder)
+                    }
+                })
+            }
+
             tableHeadRow.appendChild(th) 
         })
 
@@ -152,8 +172,8 @@ export class Table{
         const limit = Math.min(data.length, offset + this.recordsPerPage)
         this.recordsCount = data.length
         this.currentPageRecords = limit - offset
-        this.numPages = Math.ceil(this.recordsCount / this.recordsPerPage)
-
+        if(this.numPages === 0) this.numPages = Math.ceil(this.recordsCount / this.recordsPerPage)
+        
         for (let i = offset; i < limit; i++) {
             const rowData = data[i]
             const tableBodyRow = document.createElement("tr")
@@ -161,13 +181,9 @@ export class Table{
             if(!rowData) throw new Error(`The row ${i + 1} does not have data attached to it`)
 
             columns.forEach((column) => {
-                if(!column.body && !column.field){
-                    throw new Error("The column does not have data associated with it");
-                }
+                if(!column.body && !column.field) throw new Error("The column does not have data associated with it");
 
-                if(column.body && column.field){
-                    throw new Error("The column can only have one type of data associated");
-                }
+                if(column.body && column.field) throw new Error("The column can only have one type of data associated");
 
                 const tableData = document.createElement("td")
                 const dataAssoc = column.field ? "field" : "body"
@@ -195,8 +211,7 @@ export class Table{
                         }
                         break;
                 
-                    default:
-                        throw new Error("Unexpected case");
+                    default: throw new Error("Unexpected case while creating the body of the table");
                 }
 
                 tableBodyRow.appendChild(tableData)
