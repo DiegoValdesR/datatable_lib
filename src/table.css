@@ -15,7 +15,7 @@
     border: 1px solid transparent;
     border-collapse:collapse;
     width: 100%;
-    text-align: center;
+    text-align: left;
     overflow-x: auto;
 }
 
@@ -64,16 +64,15 @@
 
 /*HEADER*/
 .datatable thead{
+    width: 100%;
     background-color: rgb(204, 204, 204);
     top: 0px;
     position: sticky;
 }
 
 .datatable th{
-    text-align: center;
     font-weight: 600;
-    max-width: max-content;
-    min-width: 50px;
+    flex-direction: row;
     transition: background .3s ease-in-out;
     cursor: pointer;
 }
@@ -84,7 +83,6 @@
 
 /*BODY*/
 .datatable tbody{
-    text-align: center;
     border-bottom: #b4b4b4e1;
 }
 
@@ -117,7 +115,7 @@
 }
 
 .datatable-cont button.active{
-    background-color: #a09f9f8f;
+    background-color: #bebebe8f;
 }
 
 /*STYLES*/

@@ -22,7 +22,7 @@ export class Table{
     private currentPageRecords : number = 0 //The count of the records in a specific page
     private config : ITable 
 
-    constructor({data, columns, tableId} : ITable){
+    constructor({data, columns, tableId} : ITable){        
         this.config = {
             data : data,
             columns : columns,
@@ -60,6 +60,7 @@ export class Table{
             console.error(error.message)
         }
     };
+
     /**
      * Creating the top of the table that includes a select with values to change the number of records per page and an input for searching by characters
      */
@@ -124,32 +125,74 @@ export class Table{
         const tableHead = document.createElement("thead")
         const tableHeadRow = document.createElement("tr")
         const sortObj = new Sort()
+        const filterObj = new Filter(this.config.data)
     
         if(!this.config.columns || this.config.columns.length < 1){
             throw new Error("The headers were not send")
         };
 
-        this.config.columns.forEach((column, index) => {
+        this.config.columns.forEach((column) => {
             const th = document.createElement("th")
-            th.innerText = column.header
-            const target = column.field
+            th.innerHTML = `<span>${column.header}</span>`
+            const targetField = column.field
+            
             //Order in ascending / descending order button
-            if(target){
+            if(targetField){
+                const buttonsContainer = document.createElement('div')
+                
                 const buttonOrder = document.createElement("button")
                 buttonOrder.type = "button"
                 buttonOrder.innerText = "Ordenar"
-                th.appendChild(buttonOrder)
+                buttonOrder.dataset.type = "sort"
 
-                const selectFilter = document.createElement("select")
-                selectFilter.title = "Seleccione una opción"
-                th.appendChild(selectFilter)
+                const buttonFilters = document.createElement("button")
+                buttonFilters.type = "button"
+                buttonFilters.innerText = "Filtros"
+                buttonFilters.dataset.type = "filter"
 
-                //Events
-                buttonOrder.addEventListener('click',() => {
-                    if(target){
-                        const newOrder = sortObj.sortData(this.config.data, target)
-                        this.updateTableBody(newOrder)
+                buttonsContainer.appendChild(buttonOrder), buttonsContainer.appendChild(buttonFilters)
+                th.appendChild(buttonsContainer)
+                
+                const filterContainer = document.createElement("div")
+                filterContainer.classList.add("datatable-filter-cont")
+
+                // const selectFilter = document.createElement("select")
+                // selectFilter.title = "Seleccione una opción"
+                // const defaultOption = document.createElement('option')
+                // defaultOption.innerText = "Seleccione una opci"
+                // //Creating the select options for each column
+                // const optionValues = this.config.data.map(obj => obj[targetField])
+                // optionValues.forEach((val) => {
+                //     const option = document.createElement("option")
+                //     option.innerText = val.toString().toUpperCase()
+                //     option.value = val.toString()
+                //     selectFilter.appendChild(option)
+                // })
+
+                // th.appendChild(selectFilter)
+                //Click event
+                th.addEventListener('click',({target}) => {
+                    const targetElement = target as HTMLElement
+                    switch (targetElement.tagName.toLowerCase()) {
+                        case 'th':
+                        case 'button':
+                            const dataType = targetElement.dataset.type
+                            if(dataType && dataType === "filter"){
+                                return;
+                            }
+                            const newOrder = sortObj.sortData(this.config.data,targetField)
+                            this.updateTableBody(newOrder)
+                            break;
+                        default:
+                            break;
                     }
+                })
+                //Select event
+                th.addEventListener('change', ({target}) => {
+                    const select = target as HTMLSelectElement
+                    const value = select.value
+                    const newData = filterObj.filterData(value)
+                    this.updateTableBody(newData)
                 })
             }
 
@@ -172,7 +215,7 @@ export class Table{
         const limit = Math.min(data.length, offset + this.recordsPerPage)
         this.recordsCount = data.length
         this.currentPageRecords = limit - offset
-        if(this.numPages === 0) this.numPages = Math.ceil(this.recordsCount / this.recordsPerPage)
+        this.numPages = Math.ceil(this.recordsCount / this.recordsPerPage)
         
         for (let i = offset; i < limit; i++) {
             const rowData = data[i]

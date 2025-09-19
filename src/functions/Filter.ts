@@ -13,11 +13,11 @@ export class Filter{
         this.filteredData = this.data.filter((obj) => {
             for(const key in obj){
                 const strValue : string = obj[key].toString()
-
                 if(strValue.toLowerCase().includes(searchValue.toLowerCase())) return obj
             }
         })
 
         return this.filteredData.length > 0 ? this.filteredData : this.data
     }
+    
 }

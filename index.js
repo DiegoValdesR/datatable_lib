@@ -1,41 +1,22 @@
 import { Table } from "./dist/Table.js";
 
-const data = [
-    {id: 1, name: "Pacho", age: 18},
-    {id: 2, name: "Manolo", age: 32},
-    {id: 3, name: "Michael", age: 44},
-    {id: 4, name: "Michael", age: 44},
-    {id: 5, name: "Michael", age: 44},
-    {id: 6, name: "Michael", age: 44},
-    {id: 7, name: "Michael", age: 44},
-    {id: 8, name: "Michael", age: 44},
-    {id: 9, name: "Michael", age: 44},
-    {id: 10, name: "Michael", age: 44},
-    {id: 11, name: "Michael", age: 44},
-    {id: 12, name: "Michael", age: 44},
-    {id: 13, name: "Michael", age: 44},
-    {id: 14, name: "Michael", age: 44},
-    {id: 15, name: "Michael", age: 44},
-    {id: 16, name: "Michael", age: 44},
-    {id: 17, name: "Michael", age: 44},
-    {id: 18, name: "Michael", age: 44},
-    {id: 19, name: "Michael", age: 44},
-    {id: 20, name: "Michael", age: 44},
-    {id: 21, name: "Michael", age: 44},
-    {id: 22, name: "Michael", age: 44},
-    {id: 23, name: "Michael", age: 44},
-    {id: 24, name: "Michael", age: 44},
-    {id: 25, name: "Michael", age: 44},
-    {id: 26, name: "Michael", age: 44},
-    {id: 27, name: "Michael", age: 44},
-    {id: 28, name: "Michael", age: 44},
-    {id: 29, name: "Michael", age: 44},
-    {id: 30, name: "Michael", age: 44},
-    {id: 31, name: "Michael", age: 44},
-    {id: 32, name: "Michael", age: 44},
-    {id: 33, name: "Michael", age: 44},
-    {id: 34, name: "Michael", age: 44},
-    {id: 35, name: "Michael", age: 44},
+let data = [
+    {id:1, name: "A"},
+    {id:2, name: "B"},
+    {id:3, name: "C"},
+    {id:4, name: "D"},
+    {id:5, name: "E"},
+    {id:6, name: "F"},
+    {id:7, name: "G"},
+    {id:8, name: "H"},
+    {id:9, name: "I"},
+    {id:10, name: "J"},
+    {id:11, name: "K"},
+    {id:12, name: "L"},
+    {id:13, name: "M"},
+    {id:14, name: "N"},
+    {id:15, name: "Ñ"},
+    {id:16, name: "O"},
 ]
 
 const body = (rowData) => {
@@ -54,7 +35,6 @@ const body = (rowData) => {
 const columns = [
     {header: "ID", field: "id"},
     {header: "NAME", field: "name"},
-    {header: "AGE", field: "age"},
     {header: "ACCIONES", body: body}
 ]
 
