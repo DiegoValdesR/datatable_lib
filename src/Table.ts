@@ -1,6 +1,7 @@
 import { Filter } from "./functions/Filter.js"
 import { Pagination } from "./functions/Pagination.js"
 import { Sort } from "./functions/Sort.js"
+import icons from "./icons.js"
 
 interface IColumn{
     header: string
@@ -99,7 +100,6 @@ export class Table{
         selectEntries.addEventListener("change",({target}) => {
             const option = target as HTMLOptionElement
             this.recordsPerPage = parseInt(option.value)
-            this.currentPage = Math.min(this.currentPage, Math.ceil(this.config.data.length / this.recordsPerPage))
             //Render the table and footer content again
             this.updateTableBody()
             this.drawFooter()
@@ -124,7 +124,7 @@ export class Table{
     private drawHeaders() {
         const tableHead = document.createElement("thead")
         const tableHeadRow = document.createElement("tr")
-        const sortObj = new Sort()
+        const sortObj = new Sort(this.config.data)
         const filterObj = new Filter(this.config.data)
     
         if(!this.config.columns || this.config.columns.length < 1){
@@ -133,60 +133,60 @@ export class Table{
 
         this.config.columns.forEach((column) => {
             const th = document.createElement("th")
-            th.innerHTML = `<span>${column.header}</span>`
+            const headerContainer = document.createElement('div')
+            headerContainer.classList.add('header-cont')
             const targetField = column.field
-            
+            const spanHeader = document.createElement("span")
+            spanHeader.innerText = column.header
+
+            headerContainer.appendChild(spanHeader)
+
             //Order in ascending / descending order button
             if(targetField){
-                const buttonsContainer = document.createElement('div')
-                
+                const filtersContainer = document.createElement("div")
+                filtersContainer.classList.add('buttons-cont')
+
+                //Creating the buttons for the sorting feature
                 const buttonOrder = document.createElement("button")
                 buttonOrder.type = "button"
-                buttonOrder.innerText = "Ordenar"
+                buttonOrder.innerHTML = icons.sortUp
                 buttonOrder.dataset.type = "sort"
 
-                const buttonFilters = document.createElement("button")
-                buttonFilters.type = "button"
-                buttonFilters.innerText = "Filtros"
-                buttonFilters.dataset.type = "filter"
+                //Creating the select element for filter feature
+                const selectFilter = document.createElement("select")
+                selectFilter.title = "Seleccione una opción"
+                const defaultOption = document.createElement('option')
+                defaultOption.innerText = "Seleccione una opción"
 
-                buttonsContainer.appendChild(buttonOrder), buttonsContainer.appendChild(buttonFilters)
-                th.appendChild(buttonsContainer)
+                //Creating the select options for each column
+                const optionValues = this.config.data.map(obj => obj[targetField])
+                const uniqueOptions = [...new Set(optionValues)]
+
+                uniqueOptions.forEach((val) => {
+                    const option = document.createElement("option")
+                    option.innerText = val.toString().toUpperCase()
+                    option.value = val.toString()
+                    selectFilter.appendChild(option)
+                })
+
+                filtersContainer.appendChild(buttonOrder), filtersContainer.appendChild(selectFilter)
+                headerContainer.appendChild(filtersContainer)
                 
-                const filterContainer = document.createElement("div")
-                filterContainer.classList.add("datatable-filter-cont")
-
-                // const selectFilter = document.createElement("select")
-                // selectFilter.title = "Seleccione una opción"
-                // const defaultOption = document.createElement('option')
-                // defaultOption.innerText = "Seleccione una opci"
-                // //Creating the select options for each column
-                // const optionValues = this.config.data.map(obj => obj[targetField])
-                // optionValues.forEach((val) => {
-                //     const option = document.createElement("option")
-                //     option.innerText = val.toString().toUpperCase()
-                //     option.value = val.toString()
-                //     selectFilter.appendChild(option)
-                // })
-
-                // th.appendChild(selectFilter)
                 //Click event
+                let numOfClicks = 0
                 th.addEventListener('click',({target}) => {
                     const targetElement = target as HTMLElement
                     switch (targetElement.tagName.toLowerCase()) {
                         case 'th':
                         case 'button':
-                            const dataType = targetElement.dataset.type
-                            if(dataType && dataType === "filter"){
-                                return;
-                            }
-                            const newOrder = sortObj.sortData(this.config.data,targetField)
+                            const newOrder = sortObj.sortData(targetField)
                             this.updateTableBody(newOrder)
                             break;
-                        default:
-                            break;
+
+                        default: throw new Error("No dataset-type property found on the selected button");
                     }
                 })
+
                 //Select event
                 th.addEventListener('change', ({target}) => {
                     const select = target as HTMLSelectElement
@@ -196,6 +196,7 @@ export class Table{
                 })
             }
 
+            th.appendChild(headerContainer)
             tableHeadRow.appendChild(th) 
         })
 
@@ -205,6 +206,7 @@ export class Table{
     }
 
     private drawBody(){
+        this.currentPage = Math.min(this.currentPage, Math.ceil(this.config.data.length / this.recordsPerPage))
         const tableBody = document.createElement("tbody")
         const columns = this.config.columns
         const data : Data = this.config.data
@@ -339,9 +341,7 @@ export class Table{
     }
 
     private updateTableBody(data? : Data){
-        if(data){
-            this.config.data = data
-        }
+        if(data) this.config.data = data
 
         const table = document.querySelector(`#${this.config.tableId}`)
         if(!table) throw new Error(`The table with the the id: ${this.config.tableId} was not found`)

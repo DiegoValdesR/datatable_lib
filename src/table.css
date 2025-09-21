@@ -81,6 +81,33 @@
     background-color: var(--header-hover);
 }
 
+.datatable .header-cont{
+    display: flex;
+    justify-content: space-between;
+}
+
+.header-cont .buttons-cont{
+    display: flex;
+    gap: 5px;
+}
+
+.buttons-cont button{
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    background: none;
+    transition: .3s background ease;
+}
+
+.buttons-cont button svg{
+    width: 15px;
+    height: 20px;
+}
+
+.buttons-cont button:hover{
+    background-color: var(--border-color);
+}
+
 /*BODY*/
 .datatable tbody{
     border-bottom: #b4b4b4e1;

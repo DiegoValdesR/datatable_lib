@@ -1,22 +1,22 @@
 import { Table } from "./dist/Table.js";
 
 let data = [
-    {id:1, name: "A"},
-    {id:2, name: "B"},
-    {id:3, name: "C"},
-    {id:4, name: "D"},
-    {id:5, name: "E"},
-    {id:6, name: "F"},
-    {id:7, name: "G"},
-    {id:8, name: "H"},
-    {id:9, name: "I"},
-    {id:10, name: "J"},
-    {id:11, name: "K"},
-    {id:12, name: "L"},
-    {id:13, name: "M"},
-    {id:14, name: "N"},
-    {id:15, name: "Ñ"},
-    {id:16, name: "O"},
+    {id:1, name: "A" , date: "24/08/2025"},
+    {id:5, name: "B" , date: "24/08/2025"},
+    {id:6, name: "C" , date: "24/08/2025"},
+    {id:41, name: "D" , date: "24/08/2025"},
+    {id:52, name: "E" , date: "24/08/2025"},
+    {id:6, name: "F" , date: "24/08/2025"},
+    {id:74, name: "G" , date: "24/08/2025"},
+    {id:8, name: "H" , date: "24/08/2025"},
+    {id:9, name: "I" , date: "24/08/2025"},
+    {id:10, name: "J" , date: "24/08/2025"},
+    {id:11, name: "K" , date: "24/08/2025"},
+    {id:12, name: "L" , date: "24/08/2025"},
+    {id:13, name: "M" , date: "24/08/2025"},
+    {id:14, name: "N" , date: "24/08/2025"},
+    {id:15, name: "Ñ" , date: "24/08/2025"},
+    {id:16, name: "O" , date: "24/09/2025"},
 ]
 
 const body = (rowData) => {
@@ -35,6 +35,7 @@ const body = (rowData) => {
 const columns = [
     {header: "ID", field: "id"},
     {header: "NAME", field: "name"},
+    {header: "DATE", field: "date"},
     {header: "ACCIONES", body: body}
 ]
 
