@@ -100,6 +100,8 @@ export class Table{
         selectEntries.addEventListener("change",({target}) => {
             const option = target as HTMLOptionElement
             this.recordsPerPage = parseInt(option.value)
+            this.currentPage = 1
+            //this.currentPage = Math.min(this.currentPage, Math.ceil(this.config.data.length / this.recordsPerPage))
             //Render the table and footer content again
             this.updateTableBody()
             this.drawFooter()
@@ -149,12 +151,13 @@ export class Table{
                 //Creating the buttons for the sorting feature
                 const buttonOrder = document.createElement("button")
                 buttonOrder.type = "button"
-                buttonOrder.innerHTML = icons.sortUp
-                buttonOrder.dataset.type = "sort"
+                buttonOrder.title = "Ordenar elementos"
+                buttonOrder.innerHTML = icons.sortDown
 
                 //Creating the select element for filter feature
                 const selectFilter = document.createElement("select")
                 selectFilter.title = "Seleccione una opción"
+                selectFilter.name = "select-filter"
                 const defaultOption = document.createElement('option')
                 defaultOption.innerText = "Seleccione una opción"
 
@@ -173,18 +176,29 @@ export class Table{
                 headerContainer.appendChild(filtersContainer)
                 
                 //Click event
-                let numOfClicks = 0
+                let numOfClicks : number = 0
                 th.addEventListener('click',({target}) => {
                     const targetElement = target as HTMLElement
-                    switch (targetElement.tagName.toLowerCase()) {
-                        case 'th':
-                        case 'button':
-                            const newOrder = sortObj.sortData(targetField)
-                            this.updateTableBody(newOrder)
-                            break;
+                    const closestTh = targetElement.closest('th')
 
-                        default: throw new Error("No dataset-type property found on the selected button");
+                    //Making sure that what the user pressed was the sorting button
+                    if(targetElement.tagName === "SELECT" || !closestTh) return;
+                    numOfClicks++
+
+                    const iconsObj : Record<number, string> = {
+                        1 : icons.sortUp,
+                        2 : icons.sortNormal,
+                        3 : icons.sortDown
                     }
+
+                    if(iconsObj[numOfClicks]) {
+                        buttonOrder.innerHTML = iconsObj[numOfClicks] || icons.sortUp
+                    }
+
+                    if(numOfClicks < 1 || numOfClicks >= 3) numOfClicks = 0
+
+                    const sortedData = sortObj.sortData(targetField)
+                    this.updateTableBody(sortedData)
                 })
 
                 //Select event
@@ -206,7 +220,6 @@ export class Table{
     }
 
     private drawBody(){
-        this.currentPage = Math.min(this.currentPage, Math.ceil(this.config.data.length / this.recordsPerPage))
         const tableBody = document.createElement("tbody")
         const columns = this.config.columns
         const data : Data = this.config.data
@@ -216,8 +229,9 @@ export class Table{
         const offset = (this.currentPage - 1) * this.recordsPerPage
         const limit = Math.min(data.length, offset + this.recordsPerPage)
         this.recordsCount = data.length
-        this.currentPageRecords = limit - offset
         this.numPages = Math.ceil(this.recordsCount / this.recordsPerPage)
+        this.currentPageRecords = limit - offset
+
         
         for (let i = offset; i < limit; i++) {
             const rowData = data[i]
@@ -340,7 +354,7 @@ export class Table{
         return footerContainer
     }
 
-    private updateTableBody(data? : Data){
+    public updateTableBody(data? : Data){
         if(data) this.config.data = data
 
         const table = document.querySelector(`#${this.config.tableId}`)
