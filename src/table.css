@@ -11,11 +11,9 @@
     --disabled-button-bg: #d3d3d3;
 }
 
-.datatable-cont{
-    font-family: var(--font);
-}
 
 .datatable{
+    font-family: var(--font);
     border-collapse:collapse;
     width: 100%;
     text-align: left;
@@ -31,16 +29,17 @@
 
 /*SEARCHBAR CONTAINER*/
 .searchbar-cont{
+    font-family: var(--font);
     display: flex;
     justify-content: space-between;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
 }
 
 /*SELECT*/
 .select-container{
-    span{
-        margin-left: 10px;
-    };
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }
 
 .select-container select{
@@ -59,6 +58,25 @@
 /*INPUT*/
 .searchbar-cont input{
     font-family: var(--font);
+}
+
+/*CLEAR FILTERS BUTTON*/
+.clear-filters{
+    text-align: center;
+    cursor: pointer;
+    background: none;
+    outline: none;
+    border: none;
+    border-radius: 3px;
+    transition: .2s background ease;
+}
+
+.clear-filters svg{
+    width: 30px;
+}
+
+.clear-filters:hover{
+    background-color: var(--border-color);
 }
 
 /*HEADER*/
@@ -133,6 +151,10 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+}
+
+.datatable-footer span{
+    font-family: var(--font);
 }
 
 .pagination-cont{

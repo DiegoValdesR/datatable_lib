@@ -40,17 +40,6 @@ export class Table{
             const container = document.createElement("div")
             container.classList.add("datatable-cont")
 
-            //Creating a button for the purpose of clearing all the filters currently active
-            const clearFiltersButton = document.createElement('button')
-            clearFiltersButton.type = "button"
-            clearFiltersButton.title = "Click to clear all the active filters"
-            clearFiltersButton.innerText = "Clear filters"
-            clearFiltersButton.addEventListener('click',() => {
-                this.mutatedData = [];
-                this.updateTableBody();
-                this.drawFooter();
-            })
-
             const table = document.createElement("table")
             table.classList.add("datatable")
             table.id = this.config.tableId
@@ -64,7 +53,6 @@ export class Table{
             table.appendChild(tableBody)
 
             container.appendChild(searchBar)
-            container.appendChild(clearFiltersButton)
             container.appendChild(table)
 
             if(tableFooter) container.appendChild(tableFooter)
@@ -93,7 +81,14 @@ export class Table{
         const selectEntries = document.createElement("select");
         selectEntries.title = "Seleccione una opción";
 
-        selectContainer.appendChild(selectEntries), selectContainer.appendChild(spanEntries);
+        const clearFiltersButton = document.createElement('button')
+        clearFiltersButton.type = "button"
+        clearFiltersButton.classList.add('clear-filters')
+        clearFiltersButton.title = "Click to clear all the active filters"
+        clearFiltersButton.innerHTML = icons.clearFilters
+        
+        selectContainer.appendChild(clearFiltersButton),selectContainer.appendChild(selectEntries), selectContainer.appendChild(spanEntries);
+
         const arrEntries = [5,10,20,50,100];
         
         arrEntries.forEach(num => {
@@ -128,6 +123,12 @@ export class Table{
             this.updateTableBody(newData)
             this.drawFooter()
         });
+
+        clearFiltersButton.addEventListener('click',() => {
+            this.mutatedData = [];
+            this.updateTableBody();
+            this.drawFooter();
+        })
 
         //Appending all the of the created elements to the main container
         container.appendChild(selectContainer)
