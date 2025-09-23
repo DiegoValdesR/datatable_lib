@@ -2,9 +2,9 @@ import { Table } from "./dist/Table.js";
 
 let data = [
     {id:1, name: "A" , date: "24/08/2025"},
-    {id:5, name: "B" , date: "24/08/2025"},
-    {id:6, name: "C" , date: "24/08/2025"},
-    {id:41, name: "D" , date: "24/08/2025"},
+    {id:5, name: "Z" , date: "24/08/2025"},
+    {id:6, name: "H" , date: "24/08/2025"},
+    {id:41, name: "U" , date: "24/08/2025"},
     {id:52, name: "E" , date: "24/08/2025"},
     {id:6, name: "F" , date: "24/08/2025"},
     {id:74, name: "G" , date: "24/08/2025"},

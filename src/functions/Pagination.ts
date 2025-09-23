@@ -1,3 +1,5 @@
+import icons from "../icons.js"
+
 interface Footer{
     currentPageRecords : number
     recordsPerPage : number
@@ -54,29 +56,50 @@ export class Pagination{
 
         const firstPageButton = document.createElement("button")
         firstPageButton.title = "First Page"
-        firstPageButton.innerText = "First Page"
+        firstPageButton.innerHTML = icons.first
         firstPageButton.dataset.action = "first"
 
         const previousPageButton = document.createElement("button")
         previousPageButton.title = "Previous Page"
-        previousPageButton.innerText = "Previous Page"
+        previousPageButton.innerHTML = icons.prev
         previousPageButton.dataset.action = "previous"
+
+        if(params.currentPage < 2){
+            firstPageButton.classList.add("disabled")
+            firstPageButton.disabled = true
+
+            previousPageButton.classList.add('disabled')
+            previousPageButton.disabled = true
+        }
 
         const nextPageButton = document.createElement("button")
         nextPageButton.title = "Next Page"
-        nextPageButton.innerText = "Next Page"
+        nextPageButton.innerHTML = icons.next
         nextPageButton.dataset.action = "next"
 
         const lastPageButton = document.createElement("button")
         lastPageButton.title = "Last Page"
-        lastPageButton.innerText = "Last Page"
+        lastPageButton.innerHTML = icons.last
         lastPageButton.dataset.action = "last"
 
-        const arrButtons = [firstPageButton,previousPageButton,pagesContainer,nextPageButton,lastPageButton]
+        if(params.currentPage >= params.numPages){
+            nextPageButton.classList.add('disabled')
+            nextPageButton.disabled = true
+
+            lastPageButton.classList.add('disabled')
+            lastPageButton.disabled = true
+        }
+
+        const arrButtons = [
+            firstPageButton,
+            previousPageButton,
+            pagesContainer,
+            nextPageButton,
+            lastPageButton
+        ]
 
         arrButtons.forEach(element => {
             element.setAttribute("type","button")
-            element.style.cursor = "pointer"
             paginationContainer.appendChild(element)
         })
 

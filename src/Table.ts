@@ -7,21 +7,22 @@ interface IColumn{
     header: string
     field?: string
     body? : (rowData : Record<string,any>) => string | HTMLElement
-}
+};
 
 interface ITable {
-    data : Data,
-    columns : IColumn[],
+    data : Data
+    columns : IColumn[]
     tableId : string
-}
+};
 
 export class Table{
     private recordsPerPage : number = 10;
     private numPages : number = 0; 
     private recordsCount : number = 0; //The count of all the records
     private currentPage : number = 1;   
-    private currentPageRecords : number = 0 //The count of the records in a specific page
-    private config : ITable 
+    private currentPageRecords : number = 0; //The count of the records in a specific page
+    private config : ITable;
+    private mutatedData : Data = [];
 
     constructor({data, columns, tableId} : ITable){        
         this.config = {
@@ -29,7 +30,7 @@ export class Table{
             columns : columns,
             tableId: tableId
         }
-    }
+    };
 
     /**
      * Creates the whole table 
@@ -38,6 +39,17 @@ export class Table{
         try {
             const container = document.createElement("div")
             container.classList.add("datatable-cont")
+
+            //Creating a button for the purpose of clearing all the filters currently active
+            const clearFiltersButton = document.createElement('button')
+            clearFiltersButton.type = "button"
+            clearFiltersButton.title = "Click to clear all the active filters"
+            clearFiltersButton.innerText = "Clear filters"
+            clearFiltersButton.addEventListener('click',() => {
+                this.mutatedData = [];
+                this.updateTableBody();
+                this.drawFooter();
+            })
 
             const table = document.createElement("table")
             table.classList.add("datatable")
@@ -52,7 +64,9 @@ export class Table{
             table.appendChild(tableBody)
 
             container.appendChild(searchBar)
+            container.appendChild(clearFiltersButton)
             container.appendChild(table)
+
             if(tableFooter) container.appendChild(tableFooter)
 
             return container
@@ -67,20 +81,20 @@ export class Table{
      */
     private drawSearchBar(){
         //We create the container for the rest of the elements
-        const container = document.createElement("div")
-        container.classList.add("searchbar-cont")
+        const container = document.createElement("div");
+        container.classList.add("searchbar-cont");
 
         //Container for the selector of the number of pages displayed per page
-        const selectContainer = document.createElement("div")
-        selectContainer.classList.add("select-container")
+        const selectContainer = document.createElement("div");
+        selectContainer.classList.add("select-container");
         //Elements for the select entries per page section
-        const spanEntries = document.createElement("span")
-        spanEntries.innerText = "registros por página"
-        const selectEntries = document.createElement("select")
-        selectEntries.title = "Seleccione una opción"
+        const spanEntries = document.createElement("span");
+        spanEntries.innerText = "registros por página";
+        const selectEntries = document.createElement("select");
+        selectEntries.title = "Seleccione una opción";
 
-        selectContainer.appendChild(selectEntries), selectContainer.appendChild(spanEntries)
-        const arrEntries = [5,10,20,50,100]
+        selectContainer.appendChild(selectEntries), selectContainer.appendChild(spanEntries);
+        const arrEntries = [5,10,20,50,100];
         
         arrEntries.forEach(num => {
             const option = document.createElement("option")
@@ -91,10 +105,10 @@ export class Table{
             }
 
             selectEntries.appendChild(option)
-        })
+        });
     
-        const inputSearch  = document.createElement("input")
-        inputSearch.setAttribute("type","search")
+        const inputSearch  = document.createElement("input");
+        inputSearch.setAttribute("type","search");
 
         //Creating the corresponding events
         selectEntries.addEventListener("change",({target}) => {
@@ -105,7 +119,7 @@ export class Table{
             //Render the table and footer content again
             this.updateTableBody()
             this.drawFooter()
-        })
+        });
 
         const filter = new Filter(this.config.data)
         inputSearch.addEventListener("input",() => {
@@ -113,70 +127,73 @@ export class Table{
             const newData = filter.filterData(inputSearch.value)
             this.updateTableBody(newData)
             this.drawFooter()
-        })
-        
+        });
+
+        //Appending all the of the created elements to the main container
         container.appendChild(selectContainer)
         container.appendChild(inputSearch)
+
         return container
     };
 
     /**
      * We create the header for the table
      */
-    private drawHeaders() {
+    private drawHeaders(){
         const tableHead = document.createElement("thead")
         const tableHeadRow = document.createElement("tr")
-        const sortObj = new Sort(this.config.data)
-        const filterObj = new Filter(this.config.data)
-    
-        if(!this.config.columns || this.config.columns.length < 1){
-            throw new Error("The headers were not send")
-        };
+        const unsortedData = this.mutatedData.length >= 1 ? [...this.mutatedData] : [...this.config.data]
+        const filterObj = new Filter(unsortedData)
+        
+        if(!this.config.columns || this.config.columns.length < 1) throw new Error("The headers were not send")
 
         this.config.columns.forEach((column) => {
             const th = document.createElement("th")
+
             const headerContainer = document.createElement('div')
             headerContainer.classList.add('header-cont')
+
             const targetField = column.field
+
             const spanHeader = document.createElement("span")
             spanHeader.innerText = column.header
 
             headerContainer.appendChild(spanHeader)
 
-            //Order in ascending / descending order button
             if(targetField){
                 const filtersContainer = document.createElement("div")
                 filtersContainer.classList.add('buttons-cont')
 
                 //Creating the buttons for the sorting feature
                 const buttonOrder = document.createElement("button")
-                buttonOrder.type = "button"
-                buttonOrder.title = "Ordenar elementos"
-                buttonOrder.innerHTML = icons.sortDown
+                buttonOrder.type = "button";
+                buttonOrder.title = "Ordenar elementos";
+                buttonOrder.innerHTML = icons.sortUp;
 
                 //Creating the select element for filter feature
                 const selectFilter = document.createElement("select")
                 selectFilter.title = "Seleccione una opción"
                 selectFilter.name = "select-filter"
                 const defaultOption = document.createElement('option')
-                defaultOption.innerText = "Seleccione una opción"
+                defaultOption.innerText = "Seleccione una opción";
 
                 //Creating the select options for each column
-                const optionValues = this.config.data.map(obj => obj[targetField])
-                const uniqueOptions = [...new Set(optionValues)]
+                const optionValues = unsortedData.map(obj => obj[targetField]);
+                const uniqueOptions = [...new Set(optionValues)];
 
                 uniqueOptions.forEach((val) => {
                     const option = document.createElement("option")
                     option.innerText = val.toString().toUpperCase()
                     option.value = val.toString()
                     selectFilter.appendChild(option)
-                })
+                });
 
                 filtersContainer.appendChild(buttonOrder), filtersContainer.appendChild(selectFilter)
-                headerContainer.appendChild(filtersContainer)
+                headerContainer.appendChild(filtersContainer);
                 
-                //Click event
                 let numOfClicks : number = 0
+                let sortValue : sorting = "asc"
+                //Click event for sorting 
                 th.addEventListener('click',({target}) => {
                     const targetElement = target as HTMLElement
                     const closestTh = targetElement.closest('th')
@@ -185,44 +202,58 @@ export class Table{
                     if(targetElement.tagName === "SELECT" || !closestTh) return;
                     numOfClicks++
 
-                    const iconsObj : Record<number, string> = {
-                        1 : icons.sortUp,
-                        2 : icons.sortNormal,
-                        3 : icons.sortDown
+                    const iconsObj : Record<number, any> = {
+                        1 : () => {
+                            buttonOrder.innerHTML = icons.sortDown
+                            sortValue = "desc"
+                        },
+                        2 : () => {
+                            buttonOrder.innerHTML = icons.sortNormal
+                            sortValue = "normal"
+                        },
+                        3 : () => {
+                            buttonOrder.innerHTML = icons.sortUp
+                            sortValue = "asc"
+                        },
                     }
 
-                    if(iconsObj[numOfClicks]) {
-                        buttonOrder.innerHTML = iconsObj[numOfClicks] || icons.sortUp
-                    }
+                    if(!iconsObj[numOfClicks]) return;
+                    iconsObj[numOfClicks]()
 
                     if(numOfClicks < 1 || numOfClicks >= 3) numOfClicks = 0
 
-                    const sortedData = sortObj.sortData(targetField)
+                    const sortObj = new Sort()
+                    const sortedData = sortObj.sortData({targetField: targetField, sortValue: sortValue, data : unsortedData})
                     this.updateTableBody(sortedData)
-                })
+                });
 
-                //Select event
+                //Select event for filter
                 th.addEventListener('change', ({target}) => {
                     const select = target as HTMLSelectElement
                     const value = select.value
-                    const newData = filterObj.filterData(value)
+                    this.currentPage = 1
+                    const newData = filterObj.filterBySelect(value)
                     this.updateTableBody(newData)
-                })
-            }
+                    this.drawFooter()
+                });
+            };
 
             th.appendChild(headerContainer)
             tableHeadRow.appendChild(th) 
-        })
+        });
 
         tableHead.appendChild(tableHeadRow);
 
         return tableHead
-    }
+    };
 
+    /**
+     * Method that draws the body based on the data passed by the user
+     */
     private drawBody(){
         const tableBody = document.createElement("tbody")
         const columns = this.config.columns
-        const data : Data = this.config.data
+        const data : Data = this.mutatedData.length >= 1 ? this.mutatedData : this.config.data
         
         if(data.length < 1) throw new Error("No data was sent")
 
@@ -232,7 +263,6 @@ export class Table{
         this.numPages = Math.ceil(this.recordsCount / this.recordsPerPage)
         this.currentPageRecords = limit - offset
 
-        
         for (let i = offset; i < limit; i++) {
             const rowData = data[i]
             const tableBodyRow = document.createElement("tr")
@@ -280,8 +310,11 @@ export class Table{
         }
 
         return tableBody
-    }
+    };
 
+    /**
+     * Method that draws the lower part of the table, including the pagination
+     */
     private drawFooter(){
         //Drawing the pagination
         const paginationObj = new Pagination()
@@ -309,8 +342,12 @@ export class Table{
 
         //Pagination events
         paginationContainer.addEventListener('click',({target}) => {
-            const button = target as HTMLButtonElement
+            const targetElement = target as HTMLElement
+            if(!targetElement) return;
+
+            const button = targetElement.closest("button")
             if(!button) return;
+
             const dataAction = button.dataset.action
             if(!dataAction) return
             
@@ -352,10 +389,14 @@ export class Table{
         //Appending all the elements 
         footerContainer.appendChild(paginationContainer)
         return footerContainer
-    }
+    };
 
-    public updateTableBody(data? : Data){
-        if(data) this.config.data = data
+    /**
+     * Method that re-draws the body of the table, if the user passes a new object with data then the old stored data 
+     * gets updated to the new value
+     */
+    public updateTableBody(data? : Data) : void{
+        if(data) this.mutatedData = data
 
         const table = document.querySelector(`#${this.config.tableId}`)
         if(!table) throw new Error(`The table with the the id: ${this.config.tableId} was not found`)
@@ -366,5 +407,5 @@ export class Table{
         const newBody = this.drawBody()
         oldBody.innerHTML = "" 
         oldBody.innerHTML = newBody.innerHTML
-    }
-}
+    };
+};

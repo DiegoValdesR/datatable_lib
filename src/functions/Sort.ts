@@ -1,16 +1,17 @@
-type sorting = "asc" | "desc" | "normal"
+interface SortingParams{
+    targetField: string
+    sortValue : sorting
+    data : Data
+}
 
 export class Sort{
-    private sortValue : sorting = "asc"
-    private data : Data = []
     private sortedData : Data = []
 
-    constructor(data: Data){
-        this.data = data
-    }
+    public sortData(params : SortingParams){
+        const temporalData = [...params.data]
+        const target = params.targetField
+        const sortValue = params.sortValue
 
-    public sortData(target : string){
-        const temporalData = [...this.data]
         let valueType = ""
 
         temporalData.forEach((row) => {
@@ -23,38 +24,24 @@ export class Sort{
             return
         })
 
-        switch (this.sortValue) {
-            case "asc":
-                this.sortValue = "desc"
-                break;
-
-            case "desc":
-                this.sortValue = "normal"
-                break;
-            
-            default:
-                this.sortValue = "asc"
-                break;
-        }
-        
         //Sorting depending of the type of the target value
-        if(this.sortValue !== "normal"){
+        if(params.sortValue !== "normal"){
             switch (valueType) {
                 case "number":
-                    this.sortedData = temporalData.sort((a,b) => this.sortValue === "asc" ? a[target] - b[target] : b[target] - a[target])
+                    this.sortedData = temporalData.sort((a,b) => sortValue === "asc" ? a[target] - b[target] : b[target] - a[target])
                     break;
 
                 case "string":
-                    this.sortedData = temporalData.sort((a,b) => this.sortValue === "asc" ? a[target].localeCompare(b[target]) : b[target].localeCompare(a[target]))
+                    this.sortedData = temporalData.sort((a,b) => sortValue === "asc" ? a[target].localeCompare(b[target]) : b[target].localeCompare(a[target]))
                     break;
                 
                 default:
-                    this.sortedData = this.data
+                    this.sortedData = params.data
                     break;
             }
 
         }else{
-            this.sortedData = this.data
+            this.sortedData = params.data
         }
 
         return this.sortedData

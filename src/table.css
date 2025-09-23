@@ -2,9 +2,13 @@
 
 :root{
     --font: 'Poppins';
+    --header-color : #bdbdbd;
     --border: 1px solid #a09f9f8f;
     --border-color: #a09f9f8f;
-    --header-hover: #a1a1a160;
+    --button-header: #8886868f;
+    --header-hover: #a1a1a1;
+    --select-background: #fff;
+    --disabled-button-bg: #d3d3d3;
 }
 
 .datatable-cont{
@@ -12,7 +16,6 @@
 }
 
 .datatable{
-    border: 1px solid transparent;
     border-collapse:collapse;
     width: 100%;
     text-align: left;
@@ -21,7 +24,7 @@
 
 .datatable th, .datatable td{
     font-size: 14px;
-    max-width: 120px;
+    min-width: 120px;
     padding: 15px;
     border-bottom: var(--border);
 }
@@ -45,12 +48,8 @@
     padding: 8px;
     cursor: pointer;
     border: var(--border);
+    border-radius: 3px;
     outline: none;
-}
-
-.searchbar-cont select::picker-icon{
-    content: '';
-    color: red;
 }
 
 .select-container select option{
@@ -65,12 +64,14 @@
 /*HEADER*/
 .datatable thead{
     width: 100%;
-    background-color: rgb(204, 204, 204);
     top: 0px;
     position: sticky;
+    z-index: 1;
 }
 
 .datatable th{
+    background-color: var(--header-color);
+    text-align: center;
     font-weight: 600;
     flex-direction: row;
     transition: background .3s ease-in-out;
@@ -81,8 +82,20 @@
     background-color: var(--header-hover);
 }
 
+.datatable th select{
+    border: 1px solid var(--border-color);
+    outline: none;
+    padding: 3px;
+    border-radius: 3px;
+    background-color: var(--select-background);
+    font-family: var(--font);
+    cursor: pointer;
+    transition: .2s background ease;
+}
+
 .datatable .header-cont{
     display: flex;
+    align-items: center;
     justify-content: space-between;
 }
 
@@ -97,7 +110,6 @@
     border: none;
     border-radius: 4px;
     background: none;
-    text-align: center;
     transition: .3s background ease;
 }
 
@@ -107,7 +119,7 @@
 }
 
 .buttons-cont button:hover{
-    background-color: var(--border-color);
+    background-color: var(--button-header);
 }
 
 /*BODY*/
@@ -128,23 +140,47 @@
 }
 
 .pagination-cont button{
+    cursor: pointer;
+    border: none;
     outline: none;
     padding: 1rem;
-    background-color: none;
-    border: 1px solid var(--border-color);
+    background: none;
+    transition: .2s background ease-in;
+}
+
+.pagination-cont button:hover{
+    background-color: var(--border-color);
+}
+
+.pagination-cont button.disabled{
+    cursor:not-allowed;
+    opacity: .5;
+}
+
+.pagination-cont button.disabled:hover{
+    background: none;
 }
 
 .datatable-footer .pages-cont{
     display: flex;
+    gap: 10px;
     flex-direction: row;
 }
 
 .pages-cont button{
-    cursor: pointer;
+    text-align: center;
+    width: 50px;
+    font-family: var(--font);
+    font-weight: 700;
+    padding: 10px;
+}
+
+.datatable-footer button svg{
+    width: 15px;
 }
 
 .datatable-cont button.active{
-    background-color: #bebebe8f;
+    background-color: var(--border-color);
 }
 
 /*STYLES*/
