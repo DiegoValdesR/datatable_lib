@@ -1,14 +1,18 @@
 interface SortingParams{
     targetField: string
     sortValue : sorting
-    data : Data
 }
 
 export class Sort{
     private sortedData : Data = []
+    private data : Data = []
+
+    constructor(data : Data){
+        this.data = data
+    }
 
     public sortData(params : SortingParams){
-        const temporalData = [...params.data]
+        const temporalData = [...this.data]
         const target = params.targetField
         const sortValue = params.sortValue
 
@@ -36,12 +40,12 @@ export class Sort{
                     break;
                 
                 default:
-                    this.sortedData = params.data
+                    this.sortedData = this.data
                     break;
             }
 
         }else{
-            this.sortedData = params.data
+            this.sortedData = this.data
         }
 
         return this.sortedData

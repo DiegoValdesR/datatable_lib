@@ -87,10 +87,14 @@ export class Table{
         clearFiltersButton.title = "Click to clear all the active filters"
         clearFiltersButton.innerHTML = icons.clearFilters
         
-        selectContainer.appendChild(clearFiltersButton),selectContainer.appendChild(selectEntries), selectContainer.appendChild(spanEntries);
+        selectContainer.appendChild(clearFiltersButton);
+        selectContainer.appendChild(selectEntries);
+        selectContainer.appendChild(spanEntries);
 
+        //Array with the different numbers of records per page selector
         const arrEntries = [5,10,20,50,100];
-        
+        arrEntries.sort((a, b) => a + b)
+
         arrEntries.forEach(num => {
             const option = document.createElement("option")
             option.value = num.toString(), option.innerText = num.toString()
@@ -119,7 +123,7 @@ export class Table{
         const filter = new Filter(this.config.data)
         inputSearch.addEventListener("input",() => {
             this.currentPage = 1
-            const newData = filter.filterData(inputSearch.value)
+            const newData = filter.filterData(inputSearch.value, "contains")
             this.updateTableBody(newData)
             this.drawFooter()
         });
@@ -144,6 +148,7 @@ export class Table{
         const tableHead = document.createElement("thead")
         const tableHeadRow = document.createElement("tr")
         const unsortedData = this.mutatedData.length >= 1 ? [...this.mutatedData] : [...this.config.data]
+        const sortObj = new Sort(unsortedData)
         const filterObj = new Filter(unsortedData)
         
         if(!this.config.columns || this.config.columns.length < 1) throw new Error("The headers were not send")
@@ -169,7 +174,7 @@ export class Table{
                 const buttonOrder = document.createElement("button")
                 buttonOrder.type = "button";
                 buttonOrder.title = "Ordenar elementos";
-                buttonOrder.innerHTML = icons.sortUp;
+                buttonOrder.innerHTML = icons.sortDown;
 
                 //Creating the select element for filter feature
                 const selectFilter = document.createElement("select")
@@ -189,23 +194,24 @@ export class Table{
                     selectFilter.appendChild(option)
                 });
 
-                filtersContainer.appendChild(buttonOrder), filtersContainer.appendChild(selectFilter)
+                filtersContainer.appendChild(buttonOrder); 
+                filtersContainer.appendChild(selectFilter);
                 headerContainer.appendChild(filtersContainer);
                 
-                let numOfClicks : number = 0
-                let sortValue : sorting = "asc"
+                let numOfClicks : number = 0;
+                let sortValue : sorting = "asc";
                 //Click event for sorting 
                 th.addEventListener('click',({target}) => {
-                    const targetElement = target as HTMLElement
-                    const closestTh = targetElement.closest('th')
+                    const targetElement = target as HTMLElement;
+                    const closestTh = targetElement.closest('th');
 
                     //Making sure that what the user pressed was the sorting button
                     if(targetElement.tagName === "SELECT" || !closestTh) return;
-                    numOfClicks++
+                    numOfClicks++;
 
                     const iconsObj : Record<number, any> = {
                         1 : () => {
-                            buttonOrder.innerHTML = icons.sortDown
+                            buttonOrder.innerHTML = icons.sortUp
                             sortValue = "desc"
                         },
                         2 : () => {
@@ -213,19 +219,18 @@ export class Table{
                             sortValue = "normal"
                         },
                         3 : () => {
-                            buttonOrder.innerHTML = icons.sortUp
+                            buttonOrder.innerHTML = icons.sortDown
                             sortValue = "asc"
                         },
-                    }
+                    };
 
                     if(!iconsObj[numOfClicks]) return;
-                    iconsObj[numOfClicks]()
+                    iconsObj[numOfClicks]();
 
-                    if(numOfClicks < 1 || numOfClicks >= 3) numOfClicks = 0
+                    if(numOfClicks < 1 || numOfClicks >= 3) numOfClicks = 0;
 
-                    const sortObj = new Sort()
-                    const sortedData = sortObj.sortData({targetField: targetField, sortValue: sortValue, data : unsortedData})
-                    this.updateTableBody(sortedData)
+                    const sortedData = sortObj.sortData({targetField: targetField, sortValue: sortValue});
+                    this.updateTableBody(sortedData);
                 });
 
                 //Select event for filter
@@ -233,10 +238,11 @@ export class Table{
                     const select = target as HTMLSelectElement
                     const value = select.value
                     this.currentPage = 1
-                    const newData = filterObj.filterBySelect(value)
+                    const newData = filterObj.filterData(value, "equals")
                     this.updateTableBody(newData)
                     this.drawFooter()
                 });
+                
             };
 
             th.appendChild(headerContainer)
