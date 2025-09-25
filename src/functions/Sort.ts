@@ -9,7 +9,7 @@ export class Sort{
 
     constructor(data : Data){
         this.data = data
-    }
+    };
 
     public sortData(params : SortingParams){
         const temporalData = [...this.data]
@@ -49,5 +49,6 @@ export class Sort{
         }
 
         return this.sortedData
-    }
-}
+    };
+    
+};

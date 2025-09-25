@@ -320,43 +320,27 @@ export class Table{
     };
 
     /**
-     * Method that draws the lower part of the table, including the pagination
+     * Method that draws the paginatión section for the table
      */
     private drawFooter(){
         //Drawing the pagination
-        const paginationObj = new Pagination()
-        //We check if the element already exists
-        const parent = document.querySelector(`#${this.config.tableId}`)?.closest(".datatable-cont")
-        let footerContainer = parent?.querySelector(".datatable-footer")
+        const paginationObj = new Pagination();
 
-        if(parent && footerContainer){
-            footerContainer.innerHTML = ""
-            footerContainer.innerHTML = paginationObj.drawFooter({
-                currentPageRecords: this.currentPageRecords,
-                recordsPerPage: this.recordsPerPage,
-                recordsCount: this.recordsCount
-            }).innerHTML
-
-        }else{
-            footerContainer = paginationObj.drawFooter({
-                currentPageRecords: this.currentPageRecords,
-                recordsPerPage: this.recordsPerPage,
-                recordsCount: this.recordsCount
-            })
-        }
-
-        const paginationContainer = paginationObj.drawPagination({numPages: this.numPages, currentPage: this.currentPage})
+        const paginationContainer = paginationObj.drawPagination({
+            numPages: this.numPages, 
+            currentPage: this.currentPage
+        });
 
         //Pagination events
         paginationContainer.addEventListener('click',({target}) => {
-            const targetElement = target as HTMLElement
+            const targetElement = target as HTMLElement;
             if(!targetElement) return;
 
-            const button = targetElement.closest("button")
+            const button = targetElement.closest("button");
             if(!button) return;
 
-            const dataAction = button.dataset.action
-            if(!dataAction) return
+            const dataAction = button.dataset.action;
+            if(!dataAction) return;
             
             switch (dataAction) {
                 case "first":
@@ -387,15 +371,13 @@ export class Table{
             
                 default:
                     break;
-            }
+            };
 
-            this.updateTableBody()
-            this.drawFooter()
-        })
+            this.updateTableBody();
+            this.drawFooter();
+        });
 
-        //Appending all the elements 
-        footerContainer.appendChild(paginationContainer)
-        return footerContainer
+        return paginationContainer
     };
 
     /**
@@ -412,7 +394,7 @@ export class Table{
         if(!oldBody) throw new Error(`The body of the table was not found`)
 
         const newBody = this.drawBody()
-        oldBody.innerHTML = "" 
-        oldBody.innerHTML = newBody.innerHTML
+        table.removeChild(oldBody)
+        table.appendChild(newBody)
     };
 };

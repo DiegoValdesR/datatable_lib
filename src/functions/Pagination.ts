@@ -12,17 +12,6 @@ interface Pages{
 }
 
 export class Pagination{
-    public drawFooter(params : Footer){
-        const footerContainer = document.createElement('div')
-        footerContainer.classList.add("datatable-footer")
-        const spanRecords = document.createElement("span")
-
-        spanRecords.innerText = `Mostrando ${params.currentPageRecords} de ${params.recordsPerPage} para un total de ${params.recordsCount} registros.`
-
-        footerContainer.appendChild(spanRecords)
-
-        return footerContainer
-    }
 
     public drawPagination(params : Pages){
         const paginationContainer = document.createElement('div')

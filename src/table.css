@@ -172,6 +172,8 @@ body{
 
 .pagination-cont{
     display: flex;
+    margin-top: 10px;
+    justify-content: center;
 }
 
 .pagination-cont button{
@@ -181,6 +183,10 @@ body{
     padding: 1rem;
     background: none;
     transition: .2s background ease-in;
+}
+
+.pagination-cont button svg{
+    width: 15px;
 }
 
 .pagination-cont button:hover{
@@ -200,18 +206,6 @@ body{
     display: flex;
     gap: 10px;
     flex-direction: row;
-}
-
-.pages-cont button{
-    text-align: center;
-    width: 50px;
-    font-family: var(--font);
-    font-weight: 700;
-    padding: 10px;
-}
-
-.datatable-footer button svg{
-    width: 15px;
 }
 
 .datatable-cont button.active{

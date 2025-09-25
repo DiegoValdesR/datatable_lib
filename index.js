@@ -48,6 +48,6 @@ const tableObj = new Table({
 const table = tableObj.getTable()
 document.body.appendChild(table)
 
-document.addEventListener("DOMContentLoaded",() => {
-    document.querySelector("#view").addEventListener('click',(e) => console.log(e))
+document.querySelectorAll("#view").forEach((btn) => {
+    btn.addEventListener('click',(e) => console.log(e))
 })
