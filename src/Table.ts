@@ -19,8 +19,7 @@ export class Table{
     private recordsPerPage : number = 10;
     private numPages : number = 0; 
     private recordsCount : number = 0; //The count of all the records
-    private currentPage : number = 1;   
-    private currentPageRecords : number = 0; //The count of the records in a specific page
+    private currentPage : number = 1;
     private config : ITable;
     private mutatedData : Data = [];
 
@@ -81,6 +80,7 @@ export class Table{
         const selectEntries = document.createElement("select");
         selectEntries.title = "Seleccione una opción";
 
+        //Creating the button that clears the filters
         const clearFiltersButton = document.createElement('button')
         clearFiltersButton.type = "button"
         clearFiltersButton.classList.add('clear-filters')
@@ -130,6 +130,7 @@ export class Table{
 
         clearFiltersButton.addEventListener('click',() => {
             this.mutatedData = [];
+            filter.clearFilters(this.config.tableId);
             this.updateTableBody();
             this.drawFooter();
         })
@@ -268,7 +269,6 @@ export class Table{
         const limit = Math.min(data.length, offset + this.recordsPerPage)
         this.recordsCount = data.length
         this.numPages = Math.ceil(this.recordsCount / this.recordsPerPage)
-        this.currentPageRecords = limit - offset
 
         for (let i = offset; i < limit; i++) {
             const rowData = data[i]
@@ -325,6 +325,19 @@ export class Table{
     private drawFooter(){
         //Drawing the pagination
         const paginationObj = new Pagination();
+        const parent = document.querySelector(`#${this.config.tableId}`)?.closest(".datatable-cont");
+        const oldPag = parent?.querySelector(`.pagination-cont`);
+
+        //If the pagination of a table already exists, then we just remove all of it's content and replaced it with the new pagination
+        if(oldPag){
+           oldPag.innerHTML = ""
+           const newPag = paginationObj.drawPagination({
+                numPages: this.numPages, 
+                currentPage: this.currentPage
+           });
+           oldPag.innerHTML = newPag.innerHTML;
+           return;
+        };
 
         const paginationContainer = paginationObj.drawPagination({
             numPages: this.numPages, 
