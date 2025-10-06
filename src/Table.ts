@@ -6,67 +6,101 @@ import icons from "./icons.js"
 interface IColumn{
     header: string
     field?: string
-    body? : (rowData : Record<string,any>) => string | HTMLElement
+    body? : (rowData? : Record<string,any>) => string | HTMLElement
 };
 
 interface ITable {
     data : Data
     columns : IColumn[]
-    tableId : string
 };
+
+interface On{
+    selector : string
+    eventName: string
+    event : (event : Event) => void
+}
 
 export class Table{
     private recordsPerPage : number = 10;
     private numPages : number = 0; 
     private recordsCount : number = 0; //The count of all the records
     private currentPage : number = 1;
+    private offset = 0;
+    private limit = this.recordsPerPage;
     private config : ITable;
     private mutatedData : Data = [];
+    private tableContainer = document.createElement('div');
 
-    constructor({data, columns, tableId} : ITable){        
+    constructor({data, columns} : ITable){        
         this.config = {
             data : data,
-            columns : columns,
-            tableId: tableId
-        }
+            columns : columns
+        };
+
+        this.tableContainer.classList.add("datatable-cont");
     };
 
     /**
-     * Creates the whole table 
+     * Draws the table container with all of its elements
+     * @param {string} selector Optional string parameter that'll be used to select an HTML element and appends the created table to it.
      */
-    public getTable(){        
+    public create(selector? : string){
         try {
-            const container = document.createElement("div")
-            container.classList.add("datatable-cont")
+            const table = document.createElement('table');
+            table.classList.add("datatable");
 
-            const table = document.createElement("table")
-            table.classList.add("datatable")
-            table.id = this.config.tableId
+            const searchBar = this.drawTop();
+            const tableHead = this.drawHeaders();
+            const tableBody = this.drawBody();
+            const tableFooter = this.drawFooter();
             
-            const searchBar = this.drawSearchBar()
-            const tableHead = this.drawHeaders()
-            const tableBody = this.drawBody()
-            const tableFooter = this.drawFooter()
+            table.appendChild(tableHead);
+            table.appendChild(tableBody);
+
+            this.tableContainer.appendChild(searchBar);
+            this.tableContainer.appendChild(table);
+
+            if(tableFooter) this.tableContainer.appendChild(tableFooter);
             
-            table.appendChild(tableHead)
-            table.appendChild(tableBody)
+            if(selector){
+                const element = document.querySelector(selector);
+                if(!element) throw new Error(`${selector} element does not exist in the document`);
+                element.appendChild(this.tableContainer);
+                return;
+            };
 
-            container.appendChild(searchBar)
-            container.appendChild(table)
-
-            if(tableFooter) container.appendChild(tableFooter)
-
-            return container
+            document.body.appendChild(this.tableContainer);
 
         } catch (error : any) {
-            console.error(error.message)
-        }
+            console.error(error.message);
+        };
+    };
+
+    /**
+     * Allows the table to have custom events.
+     * @param params
+     */
+    public on(params: On){
+        try {
+            if (!this.tableContainer) throw new Error("Table container not found!");
+
+            this.tableContainer.addEventListener(params.eventName, (e: Event) => {
+                const target = e.target as HTMLElement;
+                
+                if (target && target.closest(params.selector)) {
+                    params.event(e);
+                };
+            });
+
+        } catch (error : any) {
+            console.error(error.message);
+        };
     };
 
     /**
      * Creating the top of the table that includes a select with values to change the number of records per page and an input for searching by characters
      */
-    private drawSearchBar(){
+    private drawTop(){
         //We create the container for the rest of the elements
         const container = document.createElement("div");
         container.classList.add("searchbar-cont");
@@ -115,8 +149,8 @@ export class Table{
             this.recordsPerPage = parseInt(option.value)
             this.currentPage = 1
             //this.currentPage = Math.min(this.currentPage, Math.ceil(this.config.data.length / this.recordsPerPage))
-            //Render the table and footer content again
-            this.updateTableBody()
+            //Render the table body and footer content again
+            this.update()
             this.drawFooter()
         });
 
@@ -124,14 +158,14 @@ export class Table{
         inputSearch.addEventListener("input",() => {
             this.currentPage = 1
             const newData = filter.filterData(inputSearch.value, "contains")
-            this.updateTableBody(newData)
+            this.update(newData)
             this.drawFooter()
         });
 
         clearFiltersButton.addEventListener('click',() => {
             this.mutatedData = [];
-            filter.clearFilters(this.config.tableId);
-            this.updateTableBody();
+            filter.clearFilters(this.tableContainer);
+            this.update();
             this.drawFooter();
         })
 
@@ -146,26 +180,26 @@ export class Table{
      * We create the header for the table
      */
     private drawHeaders(){
-        const tableHead = document.createElement("thead")
-        const tableHeadRow = document.createElement("tr")
-        const unsortedData = this.mutatedData.length >= 1 ? [...this.mutatedData] : [...this.config.data]
-        const sortObj = new Sort(unsortedData)
-        const filterObj = new Filter(unsortedData)
+        const tableHead = document.createElement("thead");
+        const tableHeadRow = document.createElement("tr");
+        const unsortedData = this.mutatedData.length >= 1 ? [...this.mutatedData] : [...this.config.data];
+        const sortObj = new Sort(unsortedData);
+        const filterObj = new Filter(unsortedData);
         
-        if(!this.config.columns || this.config.columns.length < 1) throw new Error("The headers were not send")
+        if(!this.config.columns || this.config.columns.length < 1) throw new Error("The headers were not send");
 
         this.config.columns.forEach((column) => {
-            const th = document.createElement("th")
+            const th = document.createElement("th");
 
-            const headerContainer = document.createElement('div')
-            headerContainer.classList.add('header-cont')
+            const headerContainer = document.createElement('div');
+            headerContainer.classList.add('header-cont');
 
-            const targetField = column.field
+            const targetField = column.field;
 
-            const spanHeader = document.createElement("span")
-            spanHeader.innerText = column.header
+            const spanHeader = document.createElement("span");
+            spanHeader.innerText = column.header;
 
-            headerContainer.appendChild(spanHeader)
+            headerContainer.appendChild(spanHeader);
 
             if(targetField){
                 const filtersContainer = document.createElement("div")
@@ -185,15 +219,21 @@ export class Table{
                 defaultOption.innerText = "Seleccione una opción";
 
                 //Creating the select options for each column
-                const optionValues = unsortedData.map(obj => obj[targetField]);
-                const uniqueOptions = [...new Set(optionValues)];
+                const uniqueOptions : any[] = [];
 
-                uniqueOptions.forEach((val) => {
-                    const option = document.createElement("option")
-                    option.innerText = val.toString().toUpperCase()
-                    option.value = val.toString()
-                    selectFilter.appendChild(option)
-                });
+                for(let i = this.offset; i < this.limit; i++){
+                    const object = unsortedData[i];
+                    if(!object) continue;
+                    const keyValue = object[targetField];
+
+                    if(!uniqueOptions.some(value => value === keyValue)){
+                        uniqueOptions.push(keyValue)
+                        const option = document.createElement("option");
+                        option.innerText = keyValue.toString().toUpperCase();
+                        option.value = keyValue.toString();
+                        selectFilter.appendChild(option);
+                    };
+                };
 
                 filtersContainer.appendChild(buttonOrder); 
                 filtersContainer.appendChild(selectFilter);
@@ -231,7 +271,7 @@ export class Table{
                     if(numOfClicks < 1 || numOfClicks >= 3) numOfClicks = 0;
 
                     const sortedData = sortObj.sortData({targetField: targetField, sortValue: sortValue});
-                    this.updateTableBody(sortedData);
+                    this.update(sortedData);
                 });
 
                 //Select event for filter
@@ -240,37 +280,37 @@ export class Table{
                     const value = select.value
                     this.currentPage = 1
                     const newData = filterObj.filterData(value, "equals")
-                    this.updateTableBody(newData)
+                    this.update(newData)
                     this.drawFooter()
                 });
                 
             };
 
-            th.appendChild(headerContainer)
-            tableHeadRow.appendChild(th) 
+            th.appendChild(headerContainer);
+            tableHeadRow.appendChild(th);
         });
 
         tableHead.appendChild(tableHeadRow);
 
-        return tableHead
+        return tableHead;
     };
 
     /**
      * Method that draws the body based on the data passed by the user
      */
     private drawBody(){
-        const tableBody = document.createElement("tbody")
-        const columns = this.config.columns
-        const data : Data = this.mutatedData.length >= 1 ? this.mutatedData : this.config.data
+        const tableBody = document.createElement("tbody");
+        const columns = this.config.columns;
+        const data : Data = this.mutatedData.length >= 1 ? this.mutatedData : this.config.data;
         
-        if(data.length < 1) throw new Error("No data was sent")
+        if(data.length < 1) throw new Error("No data was sent");
 
-        const offset = (this.currentPage - 1) * this.recordsPerPage
-        const limit = Math.min(data.length, offset + this.recordsPerPage)
-        this.recordsCount = data.length
-        this.numPages = Math.ceil(this.recordsCount / this.recordsPerPage)
+        this.offset = (this.currentPage - 1) * this.recordsPerPage;
+        this.limit = Math.min(data.length, this.offset + this.recordsPerPage);
+        this.recordsCount = data.length;
+        this.numPages = Math.ceil(this.recordsCount / this.recordsPerPage);
 
-        for (let i = offset; i < limit; i++) {
+        for (let i = this.offset; i < this.limit; i++) {
             const rowData = data[i]
             const tableBodyRow = document.createElement("tr")
 
@@ -314,9 +354,9 @@ export class Table{
             });
 
             tableBody.appendChild(tableBodyRow)
-        }
+        };
 
-        return tableBody
+        return tableBody;
     };
 
     /**
@@ -325,8 +365,7 @@ export class Table{
     private drawFooter(){
         //Drawing the pagination
         const paginationObj = new Pagination();
-        const parent = document.querySelector(`#${this.config.tableId}`)?.closest(".datatable-cont");
-        const oldPag = parent?.querySelector(`.pagination-cont`);
+        const oldPag = this.tableContainer.querySelector(`.pagination-cont`);
 
         //If the pagination of a table already exists, then we just remove all of it's content and replaced it with the new pagination
         if(oldPag){
@@ -386,7 +425,7 @@ export class Table{
                     break;
             };
 
-            this.updateTableBody();
+            this.update();
             this.drawFooter();
         });
 
@@ -397,11 +436,11 @@ export class Table{
      * Method that re-draws the body of the table, if the user passes a new object with data then the old stored data 
      * gets updated to the new value
      */
-    public updateTableBody(data? : Data) : void{
+    public update(data? : Data) : void{
         if(data) this.mutatedData = data
 
-        const table = document.querySelector(`#${this.config.tableId}`)
-        if(!table) throw new Error(`The table with the the id: ${this.config.tableId} was not found`)
+        const table = this.tableContainer.querySelector("table");
+        if(!table) throw new Error(`The table was not found`)
         
         let oldBody = table.querySelector("tbody")
         if(!oldBody) throw new Error(`The body of the table was not found`)
