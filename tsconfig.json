@@ -8,7 +8,7 @@
     // See also https://aka.ms/tsconfig/module
     "module": "nodenext",
     "target": "es6",
-    "types": ["./types.d.ts"],
+    "types": ["./src/types/types.d.ts"],
 
     // For nodejs:
     // "lib": ["esnext"],
@@ -35,7 +35,7 @@
 
     // Recommended Options
     "strict": true,
-    "verbatimModuleSyntax": true,
+    "verbatimModuleSyntax": false,
     "isolatedModules": true,
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",

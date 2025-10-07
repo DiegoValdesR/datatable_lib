@@ -1,4 +1,4 @@
-import icons from "../icons.js"
+import icons from "../icons/icons.js"
 
 interface Footer{
     currentPageRecords : number
