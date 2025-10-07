@@ -25,6 +25,7 @@
 }
 
 .datatable-cont{
+    overflow-x: auto;
     color: var(--text-color);
     padding: 10px;
 }
@@ -150,7 +151,7 @@
     gap: 5px;
 }
 
-.buttons-cont button{
+.header-cont button{
     cursor: pointer;
     border: none;
     border-radius: 4px;
@@ -158,12 +159,12 @@
     transition: .3s background ease;
 }
 
-.buttons-cont button svg{
+.header-cont button svg{
     width: 20px;
     height: 30px;
 }
 
-.buttons-cont button:hover{
+.header-cont button:hover{
     background-color: var(--button-header);
 }
 
@@ -221,4 +222,10 @@
 /*STYLES*/
 .datatable.stripped tbody tr:nth-child(even){
     background-color: var(--border-color) !important;
+}
+
+@media (max-width:700px) {
+    .datatable thead{
+        width: 50px;
+    }
 }

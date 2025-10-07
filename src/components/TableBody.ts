@@ -15,9 +15,9 @@ export class TableBody{
     public drawBody(params : ITableBody) : HTMLTableSectionElement{
         const tableBody = document.createElement("tbody");
         this.mutadedData = params.data ? params.data : [];
-        const data = this.mutadedData ? this.mutadedData : this.data;
+        const data = this.mutadedData.length >= 1 ? this.mutadedData : this.data;
         
-        if(data.length < 1) throw new Error("No data was sent");
+        if(data.length < 1) throw new Error("No data was sent, module: TableBody");
 
         const offset = (params.currentPage - 1) * params.recordsPerPage;
         const limit = Math.min(data.length, offset + params.recordsPerPage);
@@ -45,7 +45,7 @@ export class TableBody{
             const rowData = params.data[i];
             const tr = document.createElement("tr");
 
-            if(!rowData) throw new Error(`The row ${i + 1} does not have data attached to it`)
+            if(!rowData) throw new Error(`The row ${i + 1} does not have data attached to it`);
 
             columns.forEach((column) => {
                 if(!column.body && !column.field) throw new Error("The column does not have data associated with it");
@@ -54,29 +54,37 @@ export class TableBody{
 
                 const td = document.createElement("td");
                 const dataAssoc = column.field ? "field" : "body";
+
                 switch (dataAssoc) {
                     case "body":
                         if(column.body){
-                            
+                            const content = column.body(rowData);
+
+                            if(typeof content === "string"){
+                                td.innerHTML = content;
+                                break;
+                            };
+
+                            td.appendChild(content);
                         };
                         break;
 
                     case "field":
                         if(column.field) {
                             if(!rowData[column.field]){
-                                throw new Error(`The key ${column.field} does not exist in the data object`)
-                            }
-                            td.innerText = rowData[column.field]
-                        }
+                                throw new Error(`The key ${column.field} does not exist in the data object`);
+                            };
+                            td.innerText = rowData[column.field];
+                        };
                         break;
                 
                     default: throw new Error("Unexpected case while creating the body of the table");
-                }
+                };
 
-                tr.appendChild(td)
+                tr.appendChild(td);
             });
 
-            tableRows.push(tr)
+            tableRows.push(tr);
         };
 
         if(tableRows.length < 1) throw new Error("No table row was able to be created.");

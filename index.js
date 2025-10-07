@@ -31,14 +31,6 @@ const tableObj = new Table({
     columns : columns,
 });
 
-tableObj.create("#container")
+tableObj.createTable("#container");
 
-tableObj.on({
-    selector: "tbody button",
-    eventName: 'click',
-    event : (e) => {
-        const button = e.target;
-        alert(button.dataset.id)
-    }
-})
 

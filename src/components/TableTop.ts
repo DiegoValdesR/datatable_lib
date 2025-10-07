@@ -3,7 +3,7 @@ import icons from "../icons/icons.js";
 
 export class TableTop{
 
-    private drawTop(recordsPerPage : number){
+    public drawTop(recordsPerPage : number){
         //We create the container for the rest of the elements
         const searchbarContainer = document.createElement("div");
         searchbarContainer.classList.add("searchbar-cont");

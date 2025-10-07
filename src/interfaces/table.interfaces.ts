@@ -1,3 +1,8 @@
+export interface ITable{
+    data : Data
+    columns : ITableColumn[]
+}
+
 export interface ITableColumn{
     header: string
     field?: string
@@ -10,9 +15,10 @@ export interface ITableBody{
     currentPage : number
 }
 
-export interface ITableHeader{
-    data? : Data
-    
+export interface ITableFooter{
+    numPages : number
+    currentPage : number
+    data: Data
 }
 
 export interface ITableRow{
