@@ -1,15 +1,9 @@
-import icons from "../icons.js"
-
-interface Footer{
-    currentPageRecords : number
-    recordsPerPage : number
-    recordsCount : number
-}
+import icons from "../icons.js";
 
 interface Pages{
     currentPage : number
     numPages: number
-}
+};
 
 export class Pagination{
 
@@ -93,5 +87,5 @@ export class Pagination{
         })
 
         return paginationContainer
-    }
-}
+    };
+};

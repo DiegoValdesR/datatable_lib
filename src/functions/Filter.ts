@@ -1,4 +1,4 @@
-type filterType = "contains" | "equals"
+type filterType = "contains" | "equals";
 
 interface SelectFilter{
     data : Data
@@ -6,7 +6,7 @@ interface SelectFilter{
     offset: number
     limit : number
     targetField? : string 
-}
+};
 
 export class Filter{
     private data : Data = [];

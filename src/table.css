@@ -55,7 +55,7 @@
 }
 
 /*SEARCHBAR CONTAINER*/
-.searchbar-cont{
+.datatable-top{
     font-family: var(--font);
     display: flex;
     justify-content: space-between;
@@ -63,13 +63,13 @@
 }
 
 /*SELECT*/
-.select-container{
+.select-cont{
     display: flex;
     align-items: center;
     gap: 15px;
 }
 
-.select-container select{
+.select-cont select{
     font-family: var(--font);
     padding: 8px;
     cursor: pointer;
@@ -78,12 +78,12 @@
     outline: none;
 }
 
-.select-container select option{
+.select-cont select option{
     color: inherit;
 }
 
 /*INPUT*/
-.searchbar-cont input{
+.datatable-top input{
     font-family: var(--font);
 }
 
@@ -138,10 +138,15 @@
     transition: .2s background ease;
 }
 
-.datatable .header-cont{
+.header-cont{
     display: flex;
     align-items: center;
     justify-content: space-between;
+}
+
+.header-cont select{
+    display: block;
+    width: 100%;
 }
 
 .header-cont .buttons-cont{

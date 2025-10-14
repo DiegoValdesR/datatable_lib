@@ -9,7 +9,6 @@
     "module": "nodenext",
     "target": "es6",
     "types": ["./types.d.ts"],
-
     // For nodejs:
     // "lib": ["esnext"],
     // "types": ["node"],
