@@ -26,6 +26,7 @@ export const drawHeaders = (params : IDrawTableHeader) => {
             buttonOrder.type = "button";
             buttonOrder.title = "Sort elements";
             buttonOrder.innerHTML = icons.sortDown;
+            buttonOrder.dataset.target = targetField;
 
             //Creating the select element for filter feature
             const selectFilter = document.createElement("select");
@@ -39,6 +40,7 @@ export const drawHeaders = (params : IDrawTableHeader) => {
                 limit: params.limit,
                 targetField: targetField
             });
+
             uniqueOptions.forEach(value => selectFilter.appendChild(value));
 
             headerContainer.appendChild(buttonOrder);
@@ -55,6 +57,7 @@ export const drawHeaders = (params : IDrawTableHeader) => {
 
 const drawSelectOptions = (params : ISelectOptions) => {
     const options : HTMLOptionElement[] = [];
+    const values : string[] = [];
 
     for(let i = params.offset; i < params.limit; i++){
         const object = params.data[i];
@@ -62,10 +65,10 @@ const drawSelectOptions = (params : ISelectOptions) => {
 
         const keyValue = object[params.targetField];
 
-        if(!options.some(value => value === keyValue)){
+        if(!values.some(value => value === keyValue)){
             const option = document.createElement("option");
-            option.innerText = keyValue.toString().toUpperCase();
-            option.value = keyValue.toString();
+            option.innerText = keyValue.toUpperCase();
+            option.value = keyValue;
             options.push(option);
         };
     };

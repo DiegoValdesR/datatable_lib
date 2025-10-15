@@ -1,54 +1,38 @@
-interface SortingParams{
-    targetField: string
+interface ISortingParams{
     sortValue : sorting
+    data : Data
+    targetField : string
 }
 
-export class Sort{
-    private sortedData : Data = []
-    private data : Data = []
+export const sortData = (params : ISortingParams) => {
+    const unsortedData = [...params.data];
+    const target = params.targetField;
+    const sortValue = params.sortValue;
+    let typeofValue = "";
 
-    constructor(data : Data){
-        this.data = data
-    };
+    unsortedData.forEach((row) => {
+        if(!row[target]) return;
+        typeofValue = typeof row[target];
+    });
 
-    public sortData(params : SortingParams){
-        const temporalData = [...this.data]
-        const target = params.targetField
-        const sortValue = params.sortValue
+    //Sorting depending of the type of the target value
+    if(typeofValue.length === 0 || sortValue === "normal") return unsortedData;
 
-        let valueType = ""
-
-        temporalData.forEach((row) => {
-            if(!row[target]){
-                valueType = ""
-                return
-            }
-
-            valueType = typeof row[target]
-            return
-        })
-
-        //Sorting depending of the type of the target value
-        if(params.sortValue !== "normal"){
-            switch (valueType) {
-                case "number":
-                    this.sortedData = temporalData.sort((a,b) => sortValue === "asc" ? a[target] - b[target] : b[target] - a[target])
-                    break;
-
-                case "string":
-                    this.sortedData = temporalData.sort((a,b) => sortValue === "asc" ? a[target].localeCompare(b[target]) : b[target].localeCompare(a[target]))
-                    break;
-                
-                default:
-                    this.sortedData = this.data
-                    break;
-            }
-
-        }else{
-            this.sortedData = this.data
-        }
-
-        return this.sortedData
-    };
+    let sortedData : Data = [];
     
+    switch (typeofValue) {
+        case "number":
+            sortedData = unsortedData.sort((a,b) => sortValue === "asc" ? a[target] - b[target] : b[target] - a[target]);
+        break;
+
+        case "string":
+            sortedData = unsortedData.sort((a,b) => sortValue === "asc" ? a[target].localeCompare(b[target]) : b[target].localeCompare(a[target]));
+        break;
+                
+        default:
+            sortedData = unsortedData
+        break;
+    };
+
+    return sortedData
 };

@@ -31,12 +31,6 @@ export interface IDrawTableHeader{
     table: HTMLTableElement
 }
 
-export interface ICustomEvent{
-    selector : string
-    eventName: string
-    event : (event : Event) => void
-};
-
 export interface ISelectOptions{
     data : Data
     offset : number

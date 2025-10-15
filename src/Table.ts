@@ -1,9 +1,8 @@
-import { Filter } from "./functions/Filter.js";
-import { Sort } from "./functions/Sort.js";
+import { filterData } from "./functions/filter.js";
 import { components } from "./components/index.js";
 import { events } from "./events/index.js";
-import type { ICustomEvent, ITable } from "./interfaces/table.interface.js";
-import icons from "./icons.js";
+import type { ITable } from "./interfaces/table.interface.js";
+import type { ICustomEvent } from "./interfaces/events.interface.js";
 
 export class Table{
     private recordsPerPage : number = 10;
@@ -39,8 +38,7 @@ export class Table{
 
             this.tableContainer.appendChild(searchBar);
             this.tableContainer.appendChild(this.table);
-
-            if(tableFooter) this.tableContainer.appendChild(tableFooter);
+            this.tableContainer.appendChild(tableFooter);
             
             this.appendToHtml(selector);
 
@@ -52,7 +50,6 @@ export class Table{
     public redrawTable(data? : Data){
         if(data) this.mutatedData = data;
         this.drawBody();
-        this.drawFooter();
     };
 
     /**
@@ -66,7 +63,7 @@ export class Table{
             this.tableContainer.addEventListener(params.eventName, (e: Event) => {
                 const target = e.target as HTMLElement;
 
-                if(target.closest(params.selector)) params.event(e);
+                if(target.closest(params.selector)) params.event(e, this.config.data);
             });
 
         } catch (error : any) {
@@ -90,7 +87,6 @@ export class Table{
      */
     private drawTop(){
         const datatableTop = components.drawTop(this.recordsPerPage);
-        const filters = new Filter(this.config.data);
 
         //Custom event for changing the maximum number of records for each page 
         this.customEvent({
@@ -112,43 +108,85 @@ export class Table{
             event: ({target}) => {
                 const input = target as HTMLInputElement;
                 this.currentPage = 1;
-                this.mutatedData = filters.filterData(input.value, "contains");
+                this.mutatedData = filterData({
+                    searchValue: input.value,
+                    action: "contains",
+                    data : this.config.data
+                });
                 this.drawBody();
             }
         });
 
-        // clearFiltersButton.addEventListener('click',() => {
-        //     this.mutatedData = [];
-        //     filter.clearFilters(this.tableContainer);
-        //     this.update();
-        //     this.drawFooter();
-        // });
+        //Custom event for the clear filters button
+        this.customEvent({
+            selector: ".datatable-top button",
+            eventName: "click",
+            event: () => {
+                this.mutatedData = [];
+                this.drawBody();
+            }
+        });
 
         return datatableTop;
     };
 
     /**
-     * We create the header for the table
+     * The table head section of the table
      */
     private drawHeaders(){
-        const unsortedData = this.mutatedData.length >= 1 ? [...this.mutatedData] : [...this.config.data];
-        const sortObj = new Sort(unsortedData);
-        const filterObj = new Filter(unsortedData);
+        let currentData = this.getCurrentData();
 
         const thead = components.drawHeaders({
             columns: this.config.columns,
-            data : unsortedData,
+            data : currentData,
             offset: this.offset,
             limit : this.limit,
             table : this.table
-        })
+        });
+
+        //Event for the select filter
+        this.customEvent({
+            selector: "th select",
+            eventName:"change",
+            event: ({target}) => {
+                const option = target as HTMLOptionElement;
+                currentData = this.getCurrentData();
+                this.mutatedData = filterData({
+                    searchValue: option.value,
+                    action: "equals",
+                    data: currentData
+                });
+                this.currentPage = 1;
+                this.drawBody();
+            }
+        });
+        
+        //Event for sorting elements
+        let numberOfClicks : numberOfClicks = 1;
+        this.customEvent({
+            selector: "th",
+            eventName: "click",
+            event: ({target}) => {
+                currentData = this.getCurrentData();
+                
+                this.mutatedData = events.sortingEvent({
+                    target : target as EventTarget,
+                    data: currentData,
+                    numberOfClicks : numberOfClicks
+                });
+
+                this.drawBody();
+                if(numberOfClicks < 2) numberOfClicks ++;
+                else numberOfClicks = 1;
+            }
+        });
 
         return thead;
     };
 
     private drawBody(){
         const columns = this.config.columns;
-        const data = this.mutatedData.length >= 1 ? this.mutatedData : this.config.data;
+        const data = this.getCurrentData();
 
         if(data.length === 0) throw new Error("No data was sent");
 
@@ -198,5 +236,9 @@ export class Table{
         });
 
         return footerContainer;
+    };
+
+    private getCurrentData(){
+        return this.mutatedData.length >= 1 ? this.mutatedData : this.config.data;
     };
 };
