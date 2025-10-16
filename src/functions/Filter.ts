@@ -6,6 +6,22 @@ interface IFilterData{
     data : Data
 }
 
+type filterActionsParams = {
+    value : string
+    searchValue : string
+}
+
+const filterActions : Record<filterType, (params : filterActionsParams) => boolean> = {
+    contains : ({value ,searchValue}) => {
+        if(value.toLowerCase().includes(searchValue.toLowerCase())) return true;
+        return false;
+    },
+    equals : ({value, searchValue}) => {
+        if(value.toLowerCase() === searchValue.toLowerCase()) return true;
+        return false
+    }
+};
+
 export const filterData = (params : IFilterData) => {
     if(params.searchValue.length === 0) return params.data;
         
@@ -13,17 +29,15 @@ export const filterData = (params : IFilterData) => {
         for(const key in obj){
             const strValue : string = obj[key].toString();
 
-            switch (params.action) {
-                case "contains":
-                    if(strValue.toLowerCase().includes(params.searchValue.toLowerCase())) return obj;
-                break;
+            if(!filterActions[params.action]) return;
 
-                case "equals":
-                    if(strValue.toLowerCase() === params.searchValue.toLowerCase()) return obj;
-                break;
-                
-                default: throw new Error("Unexpected value while filtering the data");
-            };
+            const action = filterActions[params.action]({
+                searchValue: params.searchValue,
+                value: strValue
+            });
+
+            if(action) return obj;
+
         };
     });
 

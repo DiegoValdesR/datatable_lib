@@ -15,6 +15,7 @@ export class Table{
     private mutatedData : Data = [];
     private tableContainer = document.createElement('div');
     private table = document.createElement('table');
+    private numberOfClicks : numberOfClicks = 1;
 
     constructor(params : ITable){        
         this.config = params;
@@ -24,10 +25,13 @@ export class Table{
 
     /**
      * Draws the table container with all of its elements
-     * @param {string} selector Optional string parameter that'll be used to select an HTML element and appends the created table to it.
+     * @param {string} selector Optional string parameter that'll be used to select an HTML element and append the created table to it.
      */
     public createTable(selector? : string){
         try {
+            const tableResponsive = document.createElement('div');
+            tableResponsive.classList.add('datatable-responsive');
+
             const searchBar = this.drawTop();
             const tableHead = this.drawHeaders();
             const tableBody = this.drawBody();
@@ -35,9 +39,10 @@ export class Table{
             
             this.table.appendChild(tableHead);
             this.table.appendChild(tableBody);
+            tableResponsive.appendChild(this.table);
 
             this.tableContainer.appendChild(searchBar);
-            this.tableContainer.appendChild(this.table);
+            this.tableContainer.appendChild(tableResponsive);
             this.tableContainer.appendChild(tableFooter);
             
             this.appendToHtml(selector);
@@ -59,11 +64,10 @@ export class Table{
     public customEvent(params: ICustomEvent){
         try {
             if (!this.tableContainer) throw new Error("Table container not found!");
-
+            const data = this.getCurrentData();
             this.tableContainer.addEventListener(params.eventName, (e: Event) => {
                 const target = e.target as HTMLElement;
-
-                if(target.closest(params.selector)) params.event(e, this.config.data);
+                if(target.closest(params.selector)) params.event(e, data);
             });
 
         } catch (error : any) {
@@ -89,42 +93,29 @@ export class Table{
         const datatableTop = components.drawTop(this.recordsPerPage);
 
         //Custom event for changing the maximum number of records for each page 
-        this.customEvent({
-            selector: ".datatable-top select",
-            eventName: "change",
-            event: ({target}) => {
-                const option = target as HTMLOptionElement;
-                this.recordsPerPage = parseInt(option.value);
-                this.currentPage = 1;
-                //Render the table body and footer content again
-                this.drawBody();
-            }
+        datatableTop.querySelector('select')?.addEventListener('change',({target}) => {
+            const option = target as HTMLOptionElement;
+            this.recordsPerPage = parseInt(option.value);
+            this.currentPage = 1;
+            this.drawBody();
         });
 
         //Custom event for the searchbar
-        this.customEvent({
-            selector: ".datatable-top input",
-            eventName: "input",
-            event: ({target}) => {
-                const input = target as HTMLInputElement;
-                this.currentPage = 1;
-                this.mutatedData = filterData({
-                    searchValue: input.value,
-                    action: "contains",
-                    data : this.config.data
-                });
-                this.drawBody();
-            }
+        datatableTop.querySelector('input')?.addEventListener('input',({target}) => {
+            const input = target as HTMLInputElement;
+            this.currentPage = 1;
+            this.mutatedData = filterData({
+                searchValue: input.value,
+                action: "contains",
+                data : this.config.data
+            });
+            this.drawBody();
         });
 
-        //Custom event for the clear filters button
-        this.customEvent({
-            selector: ".datatable-top button",
-            eventName: "click",
-            event: () => {
-                this.mutatedData = [];
-                this.drawBody();
-            }
+        //Event for clearing current active filters by click a button
+        datatableTop.querySelector('button')?.addEventListener('click', () => {
+            this.mutatedData = [];
+            this.drawBody();
         });
 
         return datatableTop;
@@ -144,11 +135,8 @@ export class Table{
             table : this.table
         });
 
-        //Event for the select filter
-        this.customEvent({
-            selector: "th select",
-            eventName:"change",
-            event: ({target}) => {
+        thead.querySelectorAll('select').forEach((select : HTMLSelectElement) => {
+            select.addEventListener('change',({target}) => {
                 const option = target as HTMLOptionElement;
                 currentData = this.getCurrentData();
                 this.mutatedData = filterData({
@@ -158,29 +146,32 @@ export class Table{
                 });
                 this.currentPage = 1;
                 this.drawBody();
-            }
+            });
         });
-        
-        //Event for sorting elements
-        let numberOfClicks : numberOfClicks = 1;
-        this.customEvent({
-            selector: "th",
-            eventName: "click",
-            event: ({target}) => {
+
+        thead.querySelectorAll('th').forEach((th) => {
+
+            th.addEventListener('click',({target}) => {
+                if(!target) return;
+
                 currentData = this.getCurrentData();
-                
-                this.mutatedData = events.sortingEvent({
-                    target : target as EventTarget,
+            
+                const sortedData = events.sortingEvent({
+                    target : target,
                     data: currentData,
-                    numberOfClicks : numberOfClicks
+                    numberOfClicks : this.numberOfClicks
                 });
 
-                this.drawBody();
-                if(numberOfClicks < 2) numberOfClicks ++;
-                else numberOfClicks = 1;
-            }
-        });
+                if(!sortedData) return;
 
+                this.mutatedData = sortedData;
+                this.drawBody();
+
+                if(this.numberOfClicks < 2) this.numberOfClicks ++;
+                else this.numberOfClicks = 1;
+            });
+        });
+    
         return thead;
     };
 
@@ -217,10 +208,8 @@ export class Table{
         });
 
         //Pagination event
-        this.customEvent({
-            selector: ".datatable-footer button",
-            eventName : "click",
-            event: ({target})=>{
+        footerContainer.querySelectorAll('button')?.forEach((button : HTMLButtonElement) => {
+            button.addEventListener("click", ({target}) => {
                 const htmlElement = target as HTMLElement;
                 const button = htmlElement.closest('button');
                 if(!button) return;
@@ -230,11 +219,11 @@ export class Table{
                     numPages: this.numPages,
                     button: button
                 });
-                
+                    
                 this.drawBody();
-            }
+            });
         });
-
+        
         return footerContainer;
     };
 

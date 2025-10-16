@@ -17,6 +17,7 @@ export const drawHeaders = (params : IDrawTableHeader) => {
         spanHeader.innerText = column.header;
 
         headerContainer.appendChild(spanHeader);
+        th.appendChild(headerContainer);
 
         const targetField = column.field;
 
@@ -44,10 +45,9 @@ export const drawHeaders = (params : IDrawTableHeader) => {
             uniqueOptions.forEach(value => selectFilter.appendChild(value));
 
             headerContainer.appendChild(buttonOrder);
-            headerContainer.appendChild(selectFilter);
+            th.appendChild(selectFilter);
         };
-
-        th.appendChild(headerContainer);
+        
         tr.appendChild(th);
     });
 

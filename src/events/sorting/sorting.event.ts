@@ -4,29 +4,27 @@ import type { ISortingEvent } from "../../interfaces/events.interface.js";
 
 const sortingActions : Record<numberOfClicks, (button : HTMLButtonElement) => sorting > = {
     1: (button) : sorting => {
-        button.innerText = icons.sortUp;
+        button.innerHTML = icons.sortUp;
         return "desc";
     },
     2: (button) : sorting => {
-        button.innerText = icons.sortDown;
+        button.innerHTML = icons.sortDown;
         return "asc";
     }
 };
 
 export const sortingEvent = (params : ISortingEvent) => {
-    const htmElement = params.target as HTMLElement;
-    if(htmElement.tagName === "SELECT") return params.data;
+    const htmlElement = params.target as HTMLElement;
+    const th = htmlElement.closest('th');
+    if(!th || htmlElement.tagName.toLowerCase() === "select") return;
 
-    const element = htmElement.querySelector('th button');
-    if(!element) return params.data;
+    const closestButton = th.querySelector('button');
+    if(!closestButton) return;
 
-    const button = element as HTMLButtonElement;
-    const targetField = button.dataset.target;
-    if(!targetField) return params.data;
+    const targetField = closestButton.dataset.target;
+    if(!targetField) return;
 
-    if(!sortingActions[params.numberOfClicks]) return params.data;
-    
-    const sortValue = sortingActions[params.numberOfClicks](button);
+    const sortValue = sortingActions[params.numberOfClicks](closestButton);
 
     const sortedData = sortData({
         data : params.data,

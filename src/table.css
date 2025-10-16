@@ -4,22 +4,11 @@
     --font: 'Poppins';
     --text-color: #141414;
     --icons-color : #181818;
-    --header-color : #bdbdbd;
+    --header-color : #cecece;
+    --header-hover: #c4c4c4;
     --border: 1px solid #a09f9f8f;
     --border-color: #a09f9f8f;
     --button-header: #8886868f;
-    --header-hover: #a1a1a1;
-    --select-background: #fff;
-    --disabled-button-bg: #d3d3d3;
-}
-
-.dark-mode{
-    --text-color: #141414;
-    --header-color : #bdbdbd;
-    --border: 1px solid #a09f9f8f;
-    --border-color: #a09f9f8f;
-    --button-header: #8886868f;
-    --header-hover: #a1a1a1;
     --select-background: #fff;
     --disabled-button-bg: #d3d3d3;
 }
@@ -33,12 +22,19 @@
     fill: var(--icons-color);
 }
 
-.datatable{
-    color: inherit;
+.datatable-responsive{
+    padding: 5px;
     width: 100%;
+    overflow-x: auto;
+}
+
+.datatable{
+    width: 100%;
+    color: inherit;
     font-family: var(--font);
     border-collapse:collapse;
-    text-align: left;
+    border:  1px solid var(--border);
+    text-align: center;
 }
 
 .datatable th, .datatable td{
@@ -54,7 +50,7 @@
     min-width: 120px;
 }
 
-/*SEARCHBAR CONTAINER*/
+/*TOP OF THE TABLE*/
 .datatable-top{
     font-family: var(--font);
     display: flex;
@@ -107,24 +103,16 @@
 }
 
 /*HEADER*/
-.datatable thead{
-    width: 100%;
-    top: 0px;
-    position: sticky;
-    z-index: 1;
-}
-
 .datatable th{
-    background-color: var(--header-color);
     text-align: center;
     font-weight: 600;
     flex-direction: row;
-    transition: background .3s ease-in-out;
     cursor: pointer;
+    transition: box-shadow .1s ease-in-out;
 }
 
 .datatable th:hover{
-    background-color: var(--header-hover);
+  box-shadow: 0px 0px 5px 1px;
 }
 
 .datatable th select{
@@ -142,6 +130,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    margin-bottom: 10px;
 }
 
 th select{
@@ -220,4 +209,15 @@ th button:hover{
 /*STYLES*/
 .datatable.stripped tbody tr:nth-child(even){
     background-color: var(--border-color) !important;
+}
+
+@media (max-width: 600px) {
+    .datatable-top{
+        align-items: center;
+        flex-direction: column;
+
+        .select-cont{
+            margin-bottom: 10px;
+        }
+    }
 }

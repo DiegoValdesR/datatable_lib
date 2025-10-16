@@ -15,7 +15,7 @@ export const drawTop = (recordsPerPage : number)=> {
 
     //Select element
     const selectEntries = document.createElement("select");
-    selectEntries.title = "Seleccione una opción";
+    selectEntries.title = "Select an option!";
 
     //Creating the button that clears the filters
     const clearFiltersButton = document.createElement('button');
