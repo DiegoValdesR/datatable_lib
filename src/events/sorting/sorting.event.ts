@@ -10,6 +10,10 @@ const sortingActions : Record<numberOfClicks, (button : HTMLButtonElement) => so
     2: (button) : sorting => {
         button.innerHTML = icons.sortDown;
         return "asc";
+    },
+    3: (button) => {
+        button.innerHTML = icons.sortNormal;
+        return "normal";
     }
 };
 

@@ -3,8 +3,10 @@ import { components } from "./components/index.js";
 import { events } from "./events/index.js";
 import type { ITable } from "./interfaces/table.interface.js";
 import type { ICustomEvent } from "./interfaces/events.interface.js";
+import { drawSelectOptions } from "./components/drawHeaders.js";
+import './table.css';
 
-export class Table{
+class TableLib{
     private recordsPerPage : number = 10;
     private numPages : number = 0; 
     private recordsCount : number = 0;
@@ -16,7 +18,7 @@ export class Table{
     private tableContainer = document.createElement('div');
     private table = document.createElement('table');
     private numberOfClicks : numberOfClicks = 1;
-
+    
     constructor(params : ITable){        
         this.config = params;
         this.tableContainer.classList.add("datatable-cont");
@@ -126,8 +128,31 @@ export class Table{
      */
     private drawHeaders(){
         let currentData = this.getCurrentData();
+        let thead = this.table.querySelector('thead');
+        
+        if(thead){
+            const selects = thead.querySelectorAll("th select");
+            const fields = this.config.columns.filter(column => column.field !== undefined);
 
-        const thead = components.drawHeaders({
+            selects.forEach((select, index) => {
+                const targetField = fields[index]?.field;
+                if(!targetField) return;
+
+                select.innerHTML = "";
+                const options = drawSelectOptions({
+                    limit: this.limit,
+                    offset: this.offset,
+                    data: currentData,
+                    targetField: targetField
+                });
+
+                options.forEach(option => select.appendChild(option));
+            });
+            
+            return thead;
+        };
+
+        thead = components.drawHeaders({
             columns: this.config.columns,
             data : currentData,
             offset: this.offset,
@@ -135,6 +160,7 @@ export class Table{
             table : this.table
         });
 
+        //Event for the select filter
         thead.querySelectorAll('select').forEach((select : HTMLSelectElement) => {
             select.addEventListener('change',({target}) => {
                 const option = target as HTMLOptionElement;
@@ -149,8 +175,8 @@ export class Table{
             });
         });
 
+        //Sorting event
         thead.querySelectorAll('th').forEach((th) => {
-
             th.addEventListener('click',({target}) => {
                 if(!target) return;
 
@@ -167,7 +193,7 @@ export class Table{
                 this.mutatedData = sortedData;
                 this.drawBody();
 
-                if(this.numberOfClicks < 2) this.numberOfClicks ++;
+                if(this.numberOfClicks < 3) this.numberOfClicks ++;
                 else this.numberOfClicks = 1;
             });
         });
@@ -231,3 +257,5 @@ export class Table{
         return this.mutatedData.length >= 1 ? this.mutatedData : this.config.data;
     };
 };
+
+export default TableLib;

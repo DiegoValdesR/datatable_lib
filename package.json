@@ -8,6 +8,7 @@
     "dist"
   ],
   "scripts": {
+    "build": "vite build",
     "start": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -28,6 +29,7 @@
   },
   "homepage": "https://github.com/DiegoValdesR/datatable_lib#readme",
   "devDependencies": {
-    "typescript": "5.9.2"
+    "typescript": "5.9.2",
+    "vite": "^7.1.10"
   }
 }

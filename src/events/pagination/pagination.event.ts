@@ -23,13 +23,14 @@ export const paginationEvent = (params: IPaginationEvent) =>{
         break;
 
         case "changePage":
-            const pageNumber = params.button.dataset.numPage
+            const pageNumber = params.button.dataset.numPage;
             if(!pageNumber) throw new Error("The number of the page was not found");
-            params.currentPage = parseInt(pageNumber)
+            params.currentPage = parseInt(pageNumber);
         break;
             
         default:
-            break;
+            console.error("No action definition found for the button");
+        break;
     };
 
     return params.currentPage;

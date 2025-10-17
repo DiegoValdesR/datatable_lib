@@ -3,11 +3,15 @@ import type { IDrawTableHeader, ISelectOptions } from "./../interfaces/table.int
 
 export const drawHeaders = (params : IDrawTableHeader) => {
     const thead = params.table.querySelector("thead") || document.createElement('thead');
+
+    //If the element already exists, we only redraw the select options elements
     if(thead.innerHTML.length > 0) thead.innerHTML = "";
 
     const tr = document.createElement('tr');
 
     params.columns.forEach((column) => {
+        const targetField = column.field;
+
         const th = document.createElement("th");
 
         const headerContainer = document.createElement('div');
@@ -19,13 +23,12 @@ export const drawHeaders = (params : IDrawTableHeader) => {
         headerContainer.appendChild(spanHeader);
         th.appendChild(headerContainer);
 
-        const targetField = column.field;
-
         if(targetField){
             //Creating the buttons for the sorting feature
             const buttonOrder = document.createElement("button");
             buttonOrder.type = "button";
             buttonOrder.title = "Sort elements";
+            buttonOrder.classList.add("sort");
             buttonOrder.innerHTML = icons.sortDown;
             buttonOrder.dataset.target = targetField;
 
@@ -55,7 +58,7 @@ export const drawHeaders = (params : IDrawTableHeader) => {
     return thead;
 };
 
-const drawSelectOptions = (params : ISelectOptions) => {
+export const drawSelectOptions = (params : ISelectOptions) => {
     const options : HTMLOptionElement[] = [];
     const values : string[] = [];
 
