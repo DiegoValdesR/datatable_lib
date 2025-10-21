@@ -27,7 +27,7 @@ export default defineConfig({
     minify: 'esbuild',
     cssMinify: true, 
     sourcemap: false,
-    outDir: 'vite-dist',
+    outDir: 'build',
 
   },
 })
