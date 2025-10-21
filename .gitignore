@@ -1,3 +1,5 @@
 node_modules
-index.html
-index.js
+dist
+*.html
+*.js
+.vscode

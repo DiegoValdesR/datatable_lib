@@ -29,6 +29,7 @@ export interface IDrawTableHeader{
     offset : number
     limit : number
     table: HTMLTableElement
+    selectedValue? : string
 }
 
 export interface ISelectOptions{
@@ -36,4 +37,5 @@ export interface ISelectOptions{
     offset : number
     limit : number
     targetField : string
+    selectedValue? : string
 }

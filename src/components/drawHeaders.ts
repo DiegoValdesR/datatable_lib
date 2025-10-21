@@ -42,7 +42,8 @@ export const drawHeaders = (params : IDrawTableHeader) => {
                 data: params.data,
                 offset: params.offset,
                 limit: params.limit,
-                targetField: targetField
+                targetField: targetField,
+                selectedValue: params.selectedValue
             });
 
             uniqueOptions.forEach(value => selectFilter.appendChild(value));
@@ -62,17 +63,28 @@ export const drawSelectOptions = (params : ISelectOptions) => {
     const options : HTMLOptionElement[] = [];
     const values : string[] = [];
 
+    const defaultOption = document.createElement("option");
+    defaultOption.innerText = "Select an option";
+    defaultOption.value = "";
+    options.push(defaultOption);
+
     for(let i = params.offset; i < params.limit; i++){
         const object = params.data[i];
         if(!object) continue;
 
-        const keyValue = object[params.targetField];
+        const keyValue = object[params.targetField] ? object[params.targetField].toString() : undefined;
+        if(!keyValue) continue;
 
         if(!values.some(value => value === keyValue)){
             const option = document.createElement("option");
-            option.innerText = keyValue.toString().toUpperCase();
+            option.innerText = keyValue.toUpperCase();
             option.value = keyValue;
+
+            if(params.selectedValue && params.selectedValue === keyValue) option.selected = true;
+            
             options.push(option);
+
+            values.push(keyValue);
         };
     };
 

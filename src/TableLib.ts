@@ -18,6 +18,7 @@ class TableLib{
     private tableContainer = document.createElement('div');
     private table = document.createElement('table');
     private numberOfClicks : numberOfClicks = 1;
+    private selectedValue : string = "";
     
     constructor(params : ITable){        
         this.config = params;
@@ -56,6 +57,7 @@ class TableLib{
 
     public redrawTable(data? : Data){
         if(data) this.mutatedData = data;
+        this.currentPage = 1;
         this.drawBody();
     };
 
@@ -117,6 +119,7 @@ class TableLib{
         //Event for clearing current active filters by click a button
         datatableTop.querySelector('button')?.addEventListener('click', () => {
             this.mutatedData = [];
+            this.selectedValue = "";
             this.drawBody();
         });
 
@@ -130,6 +133,7 @@ class TableLib{
         let currentData = this.getCurrentData();
         let thead = this.table.querySelector('thead');
         
+        //if the head of table already exists
         if(thead){
             const selects = thead.querySelectorAll("th select");
             const fields = this.config.columns.filter(column => column.field !== undefined);
@@ -143,7 +147,8 @@ class TableLib{
                     limit: this.limit,
                     offset: this.offset,
                     data: currentData,
-                    targetField: targetField
+                    targetField: targetField,
+                    selectedValue: this.selectedValue
                 });
 
                 options.forEach(option => select.appendChild(option));
@@ -157,22 +162,24 @@ class TableLib{
             data : currentData,
             offset: this.offset,
             limit : this.limit,
-            table : this.table
+            table : this.table,
+            selectedValue: this.selectedValue
         });
 
         //Event for the select filter
-        thead.querySelectorAll('select').forEach((select : HTMLSelectElement) => {
-            select.addEventListener('change',({target}) => {
-                const option = target as HTMLOptionElement;
-                currentData = this.getCurrentData();
-                this.mutatedData = filterData({
-                    searchValue: option.value,
-                    action: "equals",
-                    data: currentData
-                });
-                this.currentPage = 1;
-                this.drawBody();
+        thead.addEventListener('change',({target}) => {
+            const option = target as HTMLOptionElement;
+            currentData = this.getCurrentData();
+
+            this.mutatedData = filterData({
+                searchValue: option.value,
+                action: "equals",
+                data: currentData
             });
+            
+            this.selectedValue = option.value;
+            this.currentPage = 1;
+            this.drawBody();
         });
 
         //Sorting event
@@ -184,7 +191,8 @@ class TableLib{
             
                 const sortedData = events.sortingEvent({
                     target : target,
-                    data: currentData,
+                    data: this.config.data,
+                    mutadedData: currentData,
                     numberOfClicks : this.numberOfClicks
                 });
 

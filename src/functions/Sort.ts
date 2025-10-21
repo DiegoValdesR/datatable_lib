@@ -30,8 +30,7 @@ export const sortData = (params : ISortingParams) => {
         break;
                 
         default:
-            sortedData = unsortedData
-        break;
+            break;
     };
 
     return sortedData

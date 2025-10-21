@@ -29,9 +29,10 @@ export const sortingEvent = (params : ISortingEvent) => {
     if(!targetField) return;
 
     const sortValue = sortingActions[params.numberOfClicks](closestButton);
+    const data = params.numberOfClicks >= 3 ? params.data : params.mutadedData;
 
     const sortedData = sortData({
-        data : params.data,
+        data : data,
         targetField: targetField,
         sortValue: sortValue
     });

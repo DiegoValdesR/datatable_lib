@@ -13,6 +13,7 @@ export interface IPaginationEvent{
 export interface ISortingEvent{
     target : EventTarget
     data : Data
+    mutadedData : Data
     numberOfClicks : numberOfClicks
 }
 
