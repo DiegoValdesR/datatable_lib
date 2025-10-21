@@ -73,6 +73,7 @@ export const drawSelectOptions = (params : ISelectOptions) => {
             // option.innerText = keyValue.toUpperCase();
             option.value = keyValue;
             options.push(option);
+            console.log(option);
         };
     };
 
