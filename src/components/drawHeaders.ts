@@ -70,7 +70,7 @@ export const drawSelectOptions = (params : ISelectOptions) => {
 
         if(!values.some(value => value === keyValue)){
             const option = document.createElement("option");
-            option.innerText = keyValue.toUpperCase();
+            // option.innerText = keyValue.toUpperCase();
             option.value = keyValue;
             options.push(option);
         };
