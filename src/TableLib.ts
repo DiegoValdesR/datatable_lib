@@ -24,6 +24,8 @@ class TableLib{
         this.config = params;
         this.tableContainer.classList.add("datatable-cont");
         this.table.classList.add('datatable');
+
+        if(this.config.darkMode) this.tableContainer.classList.add("dark-mode");
     };
 
     /**

@@ -1,5 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
+body{
+    background-color: rgb(46, 46, 46);
+}
+
 :root{
     --font: 'Poppins';
     --text-color: #141414;
@@ -10,6 +14,18 @@
     --border-color: #a09f9f8f;
     --button-header: #8886868f;
     --select-background: #fff;
+    --disabled-button-bg: #d3d3d3;
+}
+
+.dark-mode{
+    --text-color: #ebebeb;
+    --icons-color : #cacaca;
+    --header-color : #cecece;
+    --header-hover: #c4c4c4;
+    --border: 1px solid #a09f9f8f;
+    --border-color: #a09f9f8f;
+    --button-header: #8886868f;
+    --select-background: #2b2b2b;
     --disabled-button-bg: #d3d3d3;
 }
 
@@ -67,7 +83,9 @@
 }
 
 .select-cont select{
+    background-color: var(--select-background);
     font-family: inherit;
+    color: inherit;
     padding: 8px;
     cursor: pointer;
     border: var(--border);
@@ -81,6 +99,11 @@
 
 /*INPUT*/
 .datatable-top input{
+    border-radius: 10px;
+    overflow: none;
+    border: 1px solid var(--border-color);
+    color: inherit;
+    background-color: var(--select-background);
     font-family: inherit;
 }
 
@@ -121,6 +144,7 @@
     outline: none;
     padding: 3px;
     border-radius: 3px;
+    color: inherit;
     background-color: var(--select-background);
     font-family: inherit;
     cursor: pointer;
@@ -169,6 +193,7 @@ th button:hover{
 }
 
 .pagination-cont button{
+    color: inherit;
     font-family: 'Poppins';
     width: 50px;
     height: 50px;

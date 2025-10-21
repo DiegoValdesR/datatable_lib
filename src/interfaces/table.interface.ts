@@ -7,6 +7,7 @@ export interface IColumn{
 export interface ITable {
     data : Data
     columns : IColumn[]
+    darkMode? : boolean
 };
 
 export interface IDrawTableBody{
