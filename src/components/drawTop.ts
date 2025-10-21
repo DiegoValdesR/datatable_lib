@@ -3,11 +3,11 @@ import icons from "../icons.js";
 export const drawTop = (recordsPerPage : number)=> {
     //We create the container for the rest of the elements
     const datatableTop = document.createElement("div");
-    datatableTop.classList.add("datatable-top");
+    datatableTop.classList.add("tablelib-top");
 
     //Container for the selector of the number of pages displayed per page
     const selectContainer = document.createElement("div");
-    selectContainer.classList.add("select-cont");
+    selectContainer.classList.add("tablelib-select-cont");
 
     //Elements for the select entries per page section
     const spanEntries = document.createElement("span");
@@ -15,12 +15,13 @@ export const drawTop = (recordsPerPage : number)=> {
 
     //Select element
     const selectEntries = document.createElement("select");
+    selectEntries.classList.add("tablelib-select");
     selectEntries.title = "Select an option!";
 
     //Creating the button that clears the filters
     const clearFiltersButton = document.createElement('button');
     clearFiltersButton.type = "button";
-    clearFiltersButton.classList.add('clear-filters');
+    clearFiltersButton.classList.add('tablelib-button');
     clearFiltersButton.title = "Click to clear all the active filters";
     clearFiltersButton.innerHTML = icons.clearFilters;
         
@@ -43,6 +44,7 @@ export const drawTop = (recordsPerPage : number)=> {
 
     //Drawing the input for the searchbar
     const inputSearch  = document.createElement("input");
+    inputSearch.classList.add("tablelib-input")
     inputSearch.placeholder = "Search anything...";
     inputSearch.setAttribute("type","search");
     inputSearch.name = "searchbar";

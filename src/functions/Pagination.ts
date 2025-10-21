@@ -7,10 +7,10 @@ interface IPages{
 
 export const drawPagination = (params : IPages) => {
     const paginationContainer = document.createElement('div');
-    paginationContainer.classList.add('pagination-cont');
+    paginationContainer.classList.add('tablelib-pagination');
 
     const pagesContainer = document.createElement("div");
-    pagesContainer.classList.add('pages-cont');
+    pagesContainer.classList.add('tablelib-pages');
 
     //Setting up the pagination window style
     const maxButtons = 3;
@@ -26,6 +26,8 @@ export const drawPagination = (params : IPages) => {
         button.dataset.action = "changePage";
         button.dataset.numPage = i.toString();
         button.type = "button";
+        button.title = "Click to change the number of the current page"
+        button.classList.add('tablelib-button')
         button.innerText = i.toString();
 
         if(i === params.currentPage) button.classList.add('active');
@@ -78,8 +80,13 @@ export const drawPagination = (params : IPages) => {
     ];
 
     arrButtons.forEach(element => {
-        element.setAttribute("type","button")
-        paginationContainer.appendChild(element)
+        
+        if(element instanceof HTMLButtonElement){
+            element.setAttribute("type","button");
+            element.classList.add("tablelib-button");
+        };
+        
+        paginationContainer.appendChild(element);
     });
 
     return paginationContainer;

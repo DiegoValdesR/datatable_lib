@@ -29,13 +29,17 @@ body{
     --disabled-button-bg: #d3d3d3;
 }
 
-.datatable-cont{
-    font-family: var(--font);
+.tablelib-cont{
+    font-family: var(--font) !important;
     color: var(--text-color);
     padding: 10px;
 }
 
-.datatable-cont svg path{
+.tablelib svg{
+    width: 30px !important;
+}
+
+.tablelib-cont svg path{
     fill: var(--icons-color);
 }
 
@@ -45,7 +49,7 @@ body{
     overflow-x: auto;
 }
 
-.datatable{
+.tablelib{
     width: 100%;
     color: inherit;
     font-family: inherit;
@@ -54,7 +58,7 @@ body{
     text-align: center;
 }
 
-.datatable th, .datatable td{
+.tablelib th, .tablelib td{
     font-size: 14px;
     min-width: 120px;
     padding: 15px;
@@ -62,13 +66,13 @@ body{
     color: inherit;
 }
 
-.datatable tbody td{
+.tablelib tbody td{
     text-wrap: nowrap;
     min-width: 120px;
 }
 
 /*TOP OF THE TABLE*/
-.datatable-top{
+.tablelib-top{
     font-family: inherit;
     display: flex;
     justify-content: space-between;
@@ -76,13 +80,13 @@ body{
 }
 
 /*SELECT*/
-.select-cont{
+.tablelib-select-cont{
     display: flex;
     align-items: center;
     gap: 15px;
 }
 
-.select-cont select{
+.tablelib-select{
     background-color: var(--select-background);
     font-family: inherit;
     color: inherit;
@@ -93,12 +97,8 @@ body{
     outline: none;
 }
 
-.select-cont select option{
-    color: inherit;
-}
-
 /*INPUT*/
-.datatable-top input{
+.tablelib-input{
     border-radius: 10px;
     overflow: none;
     border: 1px solid var(--border-color);
@@ -108,7 +108,7 @@ body{
 }
 
 /*CLEAR FILTERS BUTTON*/
-.clear-filters{
+.tablelib-button{
     text-align: center;
     cursor: pointer;
     background: none;
@@ -118,123 +118,86 @@ body{
     transition: .2s background ease;
 }
 
-.clear-filters svg{
+.tablelib-button svg{
     width: 30px;
 }
 
-.clear-filters:hover{
+.tablelib-button:hover{
     background-color: var(--border-color);
 }
 
 /*HEADER*/
-.datatable th{
+.tablelib th{
     text-align: center;
     font-weight: 600;
     flex-direction: row;
     cursor: pointer;
     transition: box-shadow .1s ease-in-out;
+    &:hover{
+        box-shadow: 0px 0px 5px 1px;
+    }
 }
 
-.datatable th:hover{
-  box-shadow: 0px 0px 5px 1px;
-}
-
-.datatable th select{
-    border: 1px solid var(--border-color);
-    outline: none;
-    padding: 3px;
-    border-radius: 3px;
-    color: inherit;
-    background-color: var(--select-background);
-    font-family: inherit;
-    cursor: pointer;
-    transition: .2s background ease;
-}
-
-.header-cont{
+.tablelib-header{
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-bottom: 10px;
+
+    > button > svg{
+        width: 20px !important;
+    }
 }
 
-th select{
+.tablelib th .tablelib-select{
     display: block;
     width: 100%;
 }
 
-th button{
-    cursor: pointer;
-    border: none;
-    border-radius: 4px;
-    background: none;
-    transition: .3s background ease;
-}
-
-th button svg{
+.tablelib th button svg{
     width: 20px;
-    height: 30px;
-}
-
-th button:hover{
-    background-color: var(--button-header);
 }
 
 /*BODY*/
-.datatable tbody{
-    border-bottom: #b4b4b4e1;
+.tablelib tbody{
+    border-bottom: var(--border-color);
 }
 
 /*FOOTER*/
-.pagination-cont{
+.tablelib-pagination{
     display: flex;
     margin-top: 10px;
     justify-content: center;
 }
 
-.pagination-cont button{
+.tablelib-pagination button{
     color: inherit;
-    font-family: 'Poppins';
+    font-family: inherit;
     width: 50px;
     height: 50px;
-    cursor: pointer;
-    border: none;
-    outline: none;
     padding: 1rem;
     background: none;
     transition: .2s background ease-in;
+
+    > svg{
+        width: 15px;
+    }
+
+    &.disabled{
+        cursor:not-allowed;
+        opacity: .5;
+        background: none;
+    }
+
+    &.active{
+        background-color: var(--border-color);
+    }
 }
 
-.pagination-cont button svg{
-    width: 15px;
-}
-
-.pagination-cont button:hover{
-    background-color: var(--border-color);
-}
-
-.pagination-cont button.disabled{
-    cursor:not-allowed;
-    opacity: .5;
-}
-
-.pagination-cont button.disabled:hover{
-    background: none;
-}
-
-.pagination-cont .pages-cont{
+.tablelib-pages{
     display: flex;
     gap: 10px;
     flex-direction: row;
-}
-
-.pagination-cont button.active{
-    background-color: var(--border-color);
-}
-
-/*STYLES*/
-.datatable.stripped tbody tr:nth-child(even){
-    background-color: var(--border-color) !important;
 }
 
 @media (max-width: 600px) {

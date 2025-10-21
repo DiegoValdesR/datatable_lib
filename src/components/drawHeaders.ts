@@ -15,7 +15,7 @@ export const drawHeaders = (params : IDrawTableHeader) => {
         const th = document.createElement("th");
 
         const headerContainer = document.createElement('div');
-        headerContainer.classList.add('header-cont');
+        headerContainer.classList.add('tablelib-header');
 
         const spanHeader = document.createElement("span");
         spanHeader.innerText = column.header;
@@ -28,12 +28,13 @@ export const drawHeaders = (params : IDrawTableHeader) => {
             const buttonOrder = document.createElement("button");
             buttonOrder.type = "button";
             buttonOrder.title = "Sort elements";
-            buttonOrder.classList.add("sort");
+            buttonOrder.classList.add("tablelib-button");
             buttonOrder.innerHTML = icons.sortDown;
             buttonOrder.dataset.target = targetField;
 
             //Creating the select element for filter feature
             const selectFilter = document.createElement("select");
+            selectFilter.classList.add('tablelib-select')
             selectFilter.title = "Select an option";
             selectFilter.name = "select-filter";
 
