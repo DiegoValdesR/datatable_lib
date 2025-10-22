@@ -35,7 +35,7 @@ class TableLib{
     public createTable(selector? : string){
         try {
             const tableResponsive = document.createElement('div');
-            tableResponsive.classList.add('datatable-responsive');
+            tableResponsive.classList.add('tablelib-responsive');
 
             const searchBar = this.drawTop();
             const tableHead = this.drawHeaders();

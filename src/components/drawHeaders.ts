@@ -82,7 +82,7 @@ export const drawSelectOptions = (params : ISelectOptions) => {
             option.value = keyValue;
 
             if(params.selectedValue && params.selectedValue === keyValue) option.selected = true;
-            if(option.innerHTML.length > 10) option.innerHTML = option.innerHTML.slice(0, 10) + "...";
+            if(option.innerHTML.length > 30) option.innerHTML = option.innerHTML.slice(0, 30) + "...";
 
             options.push(option);
             values.push(keyValue);

@@ -39,7 +39,7 @@
     fill: var(--icons-color);
 }
 
-.datatable-responsive{
+.tablelib-responsive{
     padding: 5px;
     width: 100%;
     overflow-x: auto;
@@ -96,7 +96,7 @@
 /*INPUT*/
 .tablelib-input{
     border-radius: 10px;
-    overflow: none;
+    outline: #2b2b2b;
     border: 1px solid var(--border-color);
     color: inherit;
     background-color: var(--select-background);
