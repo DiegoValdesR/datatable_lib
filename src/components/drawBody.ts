@@ -33,7 +33,7 @@ export const drawBody = (params : IDrawTableBody) => {
                 };
             };
 
-            if(td.innerHTML.length > 30) td.innerHTML = td.innerHTML.slice(0, 30) + "...";
+            if(td.innerHTML.length > 30 && column.field) td.innerHTML = td.innerHTML.slice(0, 30) + "...";
 
             tr.appendChild(td);
         });
